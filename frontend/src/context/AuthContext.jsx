@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const AuthContext = createContext(null);
 
@@ -35,7 +36,7 @@ export const AuthProvider = ({ children }) => {
 
   const loadCurrentUser = async (currentToken) => {
     try {
-      const response = await fetch('/api/v1/auth/me', {
+      const response = await fetch(`${API_URL}/auth/me`, {
         headers: {
           'Authorization': `Bearer ${currentToken}`
         }
@@ -75,7 +76,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/v1/auth/login', {
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -103,7 +104,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (name, email, password, businessName, role, businessId, designation, superAdminId, plan) => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/v1/auth/signup', {
+      const response = await fetch(`${API_URL}/auth/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, businessName, role, businessId, designation, superAdminId, plan }),
@@ -141,7 +142,9 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('bizos_token');
     setIsLoading(false);
     try {
-      await fetch('/api/v1/auth/logout', { method: 'POST' });
+      await fetch(`${API_URL}/auth/logout`, {
+        method: 'POST',
+      });
     } catch (e) {
       // Ignore network errors on logout
     }
