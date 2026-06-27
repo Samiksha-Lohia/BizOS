@@ -70,6 +70,16 @@ const authLimiter = rateLimit({
 
 app.use("/api", apiLimiter);
 
+app.get("/", (_req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "BizOS API is running 🚀",
+    version: "v1",
+    health: "/health",
+    api: "/api/v1",
+  });
+});
+
 app.get("/health", (_req, res) => {
   res.status(200).json({
     success: true,
