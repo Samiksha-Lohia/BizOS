@@ -1,0 +1,369 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║                    BizOS MSME - TEST DATA REFERENCE                     ║
+║                    Ready to copy-paste into the website                  ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+================================================================================
+  SUPER ADMIN CREDENTIALS (Pre-seeded — do NOT register, just login directly)
+================================================================================
+
+  Login URL:      http://localhost:5173/login
+  Email:          superadmin@bizos.internal
+  Password:       admin123
+  Super Admin ID: 6a3f7209690aa098cad2a4b2
+
+  ⚠ Copy this Super Admin ID — you will need it when registering Admin accounts.
+
+================================================================================
+STEP 1:  REGISTER AN ADMIN FIRST (if not done already)
+         Go to → http://localhost:5173/register
+================================================================================
+
+  Name:              Rajesh Sharma
+  Role:              Admin (Create Business)
+  Business Name:     Sharma Trading Co.
+  Super Admin ID:    6a3f7209690aa098cad2a4b2
+  Plan:              Free Trial
+  Email:             rajesh.sharma@sharmatrading.com
+  Password:          Admin@123456
+
+  ⚠ IMPORTANT: After registering, go to Settings page → copy the Business ID.
+  You will need that Business ID to register all the users below.
+
+
+================================================================================
+STEP 2:  REGISTER USERS VIA WEBSITE
+         Go to → http://localhost:5173/register (logout first each time)
+         Use the Business ID from Step 1 for all users below
+================================================================================
+
+──────────────────────────────────────────
+  5 MANAGERS
+──────────────────────────────────────────
+
+Manager 1:
+  Name:           Priya Mehta
+  Role:           Manager (Join existing Business)
+  Business ID:    [paste from Step 1 settings]
+  Email:          priya.mehta@sharmatrading.com
+  Password:       Manager@1234
+
+Manager 2:
+  Name:           Vikram Singh
+  Role:           Manager (Join existing Business)
+  Business ID:    [paste from Step 1 settings]
+  Email:          vikram.singh@sharmatrading.com
+  Password:       Manager@1234
+
+Manager 3:
+  Name:           Ananya Desai
+  Role:           Manager (Join existing Business)
+  Business ID:    [paste from Step 1 settings]
+  Email:          ananya.desai@sharmatrading.com
+  Password:       Manager@1234
+
+Manager 4:
+  Name:           Rohit Kapoor
+  Role:           Manager (Join existing Business)
+  Business ID:    [paste from Step 1 settings]
+  Email:          rohit.kapoor@sharmatrading.com
+  Password:       Manager@1234
+
+Manager 5:
+  Name:           Sneha Iyer
+  Role:           Manager (Join existing Business)
+  Business ID:    [paste from Step 1 settings]
+  Email:          sneha.iyer@sharmatrading.com
+  Password:       Manager@1234
+
+
+──────────────────────────────────────────
+  5 EMPLOYEES (register as role "Employee")
+──────────────────────────────────────────
+
+Employee 1:
+  Name:           Amit Patel
+  Role:           Employee (Join existing Business)
+  Designation:    Cashier
+  Business ID:    [paste from Step 1 settings]
+  Email:          amit.patel@sharmatrading.com
+  Password:       Staff@12345
+
+Employee 2:
+  Name:           Neha Gupta
+  Role:           Employee (Join existing Business)
+  Designation:    Sales Executive
+  Business ID:    [paste from Step 1 settings]
+  Email:          neha.gupta@sharmatrading.com
+  Password:       Staff@12345
+
+Employee 3:
+  Name:           Suresh Kumar
+  Role:           Employee (Join existing Business)
+  Designation:    Store Keeper
+  Business ID:    [paste from Step 1 settings]
+  Email:          suresh.kumar@sharmatrading.com
+  Password:       Staff@12345
+
+Employee 4:
+  Name:           Kavita Nair
+  Role:           Employee (Join existing Business)
+  Designation:    Inventory Manager
+  Business ID:    [paste from Step 1 settings]
+  Email:          kavita.nair@sharmatrading.com
+  Password:       Staff@12345
+
+Employee 5:
+  Name:           Deepak Joshi
+  Role:           Employee (Join existing Business)
+  Designation:    Technician
+  Business ID:    [paste from Step 1 settings]
+  Email:          deepak.joshi@sharmatrading.com
+  Password:       Staff@12345
+
+
+──────────────────────────────────────────
+  5 ACCOUNTANTS
+──────────────────────────────────────────
+
+Accountant 1:
+  Name:           Meera Reddy
+  Role:           Accountant (Join existing Business)
+  Business ID:    [paste from Step 1 settings]
+  Email:          meera.reddy@sharmatrading.com
+  Password:       Account@1234
+
+Accountant 2:
+  Name:           Arvind Mishra
+  Role:           Accountant (Join existing Business)
+  Business ID:    [paste from Step 1 settings]
+  Email:          arvind.mishra@sharmatrading.com
+  Password:       Account@1234
+
+Accountant 3:
+  Name:           Pooja Verma
+  Role:           Accountant (Join existing Business)
+  Business ID:    [paste from Step 1 settings]
+  Email:          pooja.verma@sharmatrading.com
+  Password:       Account@1234
+
+Accountant 4:
+  Name:           Karan Bhatia
+  Role:           Accountant (Join existing Business)
+  Business ID:    [paste from Step 1 settings]
+  Email:          karan.bhatia@sharmatrading.com
+  Password:       Account@1234
+
+Accountant 5:
+  Name:           Nisha Agarwal
+  Role:           Accountant (Join existing Business)
+  Business ID:    [paste from Step 1 settings]
+  Email:          nisha.agarwal@sharmatrading.com
+  Password:       Account@1234
+
+
+================================================================================
+STEP 3:  ADD EMPLOYEES VIA DASHBOARD
+         Login as Admin or Manager → Dashboard → Employees → Add Employee
+================================================================================
+
+──────────────────────────────────────────
+  5 EMPLOYEES (via Employees page in dashboard)
+──────────────────────────────────────────
+
+Employee 1:
+  Full Name:              Ravi Shankar
+  Designation / Role:     Warehouse Supervisor
+  Base Monthly Salary:    28000
+  Overtime Hourly Rate:   200
+  Daily Shift Hours:      8
+  Shift Start:            09:00
+  Shift End:              18:00
+
+Employee 2:
+  Full Name:              Lakshmi Devi
+  Designation / Role:     Sales Executive
+  Base Monthly Salary:    22000
+  Overtime Hourly Rate:   175
+  Daily Shift Hours:      8
+  Shift Start:            10:00
+  Shift End:              19:00
+
+Employee 3:
+  Full Name:              Mohammed Irfan
+  Designation / Role:     Delivery Driver
+  Base Monthly Salary:    18000
+  Overtime Hourly Rate:   150
+  Daily Shift Hours:      10
+  Shift Start:            07:00
+  Shift End:              17:00
+
+Employee 4:
+  Full Name:              Sunita Rao
+  Designation / Role:     Billing Clerk
+  Base Monthly Salary:    20000
+  Overtime Hourly Rate:   160
+  Daily Shift Hours:      8
+  Shift Start:            09:30
+  Shift End:              18:30
+
+Employee 5:
+  Full Name:              Arjun Thakur
+  Designation / Role:     Store Helper
+  Base Monthly Salary:    15000
+  Overtime Hourly Rate:   120
+  Daily Shift Hours:      9
+  Shift Start:            08:00
+  Shift End:              17:00
+
+
+================================================================================
+STEP 4:  ADD PRODUCTS (via Inventory page)
+         Login as Admin or Manager → Dashboard → Inventory → Add Product
+================================================================================
+
+Product 1:
+  Name:             Basmati Rice (25kg bag)
+  Category:         Groceries
+  Purchase Price:   1200
+  Selling Price:    1500
+  Stock Quantity:   50
+  Unit:             bag
+  Min Stock Level:  10
+  GST Rate:         5
+
+Product 2:
+  Name:             Tata Salt (1kg)
+  Category:         Groceries
+  Purchase Price:   18
+  Selling Price:    28
+  Stock Quantity:   200
+  Unit:             pcs
+  Min Stock Level:  50
+  GST Rate:         5
+
+Product 3:
+  Name:             Steel Almirah (6ft)
+  Category:         Furniture
+  Purchase Price:   8500
+  Selling Price:    12000
+  Stock Quantity:   12
+  Unit:             pcs
+  Min Stock Level:  3
+  GST Rate:         18
+
+Product 4:
+  Name:             HP Printer Ink Cartridge
+  Category:         Electronics
+  Purchase Price:   650
+  Selling Price:    950
+  Stock Quantity:   35
+  Unit:             pcs
+  Min Stock Level:  10
+  GST Rate:         18
+
+Product 5:
+  Name:             Whiteboard Marker Set (Pack of 10)
+  Category:         Stationery
+  Purchase Price:   120
+  Selling Price:    199
+  Stock Quantity:   80
+  Unit:             pack
+  Min Stock Level:  20
+  GST Rate:         12
+
+
+================================================================================
+STEP 5:  ADD CUSTOMERS (via CRM page)
+         Login as Admin or Manager → Dashboard → CRM Ledger → Add Customer
+================================================================================
+
+Customer 1:
+  Name:             Arun Electronics
+  Email:            orders@arunelectronics.in
+  Phone:            9876543210
+  Address:          45, Nehru Place, New Delhi - 110019
+
+Customer 2:
+  Name:             Gupta General Store
+  Email:            guptastore@gmail.com
+  Phone:            8765432109
+  Address:          12, MG Road, Sector 14, Gurgaon - 122001
+
+Customer 3:
+  Name:             Sunrise Furniture Mart
+  Email:            info@sunrisefurniture.co.in
+  Phone:            7654321098
+  Address:          78, Industrial Area Phase 2, Chandigarh - 160002
+
+Customer 4:
+  Name:             Prime Office Supplies
+  Email:            procurement@primeoffice.com
+  Phone:            9988776655
+  Address:          301, Banjara Hills, Hyderabad - 500034
+
+Customer 5:
+  Name:             Mehta Brothers Wholesale
+  Email:            sales@mehtabros.in
+  Phone:            8877665544
+  Address:          89, Ring Road, Surat - 395002
+
+
+================================================================================
+STEP 6:  LOG EXPENSES (via Expenses page)
+         Login as Admin/Manager/Employee → Dashboard → Expenses → Log Expense
+================================================================================
+
+Expense 1:
+  Category:         Rent
+  Amount:           35000
+  Date:             2026-06-01
+  Description:      Monthly warehouse rent - June 2026
+
+Expense 2:
+  Category:         Utilities
+  Amount:           8500
+  Date:             2026-06-05
+  Description:      Electricity bill for May-June cycle
+
+Expense 3:
+  Category:         Raw Materials
+  Amount:           45000
+  Date:             2026-06-10
+  Description:      Bulk purchase of packaging materials
+
+Expense 4:
+  Category:         Transport
+  Amount:           12000
+  Date:             2026-06-12
+  Description:      Delivery truck fuel and maintenance
+
+Expense 5:
+  Category:         Marketing
+  Amount:           15000
+  Date:             2026-06-15
+  Description:      Google Ads campaign for June
+
+
+================================================================================
+  QUICK REFERENCE - LOGIN CREDENTIALS SUMMARY
+================================================================================
+
+  ROLE          EMAIL                                  PASSWORD
+  ─────────     ─────────────────────────────────      ──────────────
+  SuperAdmin    superadmin@bizos.internal              admin123
+  Admin         rajesh.sharma@sharmatrading.com        Admin@123456
+  Manager       priya.mehta@sharmatrading.com          Manager@1234
+  Manager       vikram.singh@sharmatrading.com         Manager@1234
+  Employee      amit.patel@sharmatrading.com           Staff@12345
+  Employee      neha.gupta@sharmatrading.com           Staff@12345
+  Accountant    meera.reddy@sharmatrading.com          Account@1234
+  Accountant    arvind.mishra@sharmatrading.com        Account@1234
+
+================================================================================
+  SUPER ADMIN ID (for Admin registration form)
+================================================================================
+
+  6a3f7209690aa098cad2a4b2
+
+================================================================================
