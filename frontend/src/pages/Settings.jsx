@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 const Settings = () => {
-  const { user, token } = useAuth();
+  const { user, token, authFetch } = useAuth();
   const [business, setBusiness] = useState({
     name: '',
     address: '',
@@ -40,11 +40,7 @@ const Settings = () => {
     try {
       setLoading(true);
       setError('');
-      const response = await fetch('/business', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await authFetch('/business');
       const result = await response.json();
       if (result.success && result.data) {
         setBusiness(result.data);
@@ -85,12 +81,10 @@ const Settings = () => {
     setSuccess('');
 
     try {
-      const response = await fetch('/upload', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData
+      const response = await authFetch('/upload', {
+          method: 'POST',
+          body: formData,
+          headers: {} 
       });
       
       const result = await response.json();
@@ -119,13 +113,12 @@ const Settings = () => {
     setSuccess('');
 
     try {
-      const response = await fetch('/business', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(business)
+      const response = await authFetch('/business', {
+          method: 'PUT',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(business)
       });
       
       const result = await response.json();

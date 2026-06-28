@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 const Reports = () => {
-  const { token, user } = useAuth();
+  const { token, user, authFetch } = useAuth();
   const [reportType, setReportType] = useState('gst'); // 'gst', 'sales', 'inventory'
   const [startDate, setStartDate] = useState(() => {
     const d = new Date();
@@ -39,11 +39,7 @@ const Reports = () => {
     setReportData(null);
     try {
       const url = `/dashboard/reports?type=${reportType}&startDate=${startDate}&endDate=${endDate}`;
-      const response = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await authFetch(url);
       const result = await response.json();
       if (result.success) {
         setReportData(result.data);
