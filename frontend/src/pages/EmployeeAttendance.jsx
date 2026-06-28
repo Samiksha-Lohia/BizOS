@@ -60,7 +60,7 @@ const EmployeeAttendance = () => {
 
   const fetchTodayRecord = async (empId) => {
     try {
-      const res = await authFetch(`/api/v1/attendance/my?date=${todayStr}`);
+      const res = await authFetch(`/attendance/my?date=${todayStr}`);
       const data = await res.json();
       if (data.success) {
         const myRecord = data.data.find(r => r.employeeId?._id === empId) || data.data[0];
@@ -82,7 +82,7 @@ const EmployeeAttendance = () => {
         past7.push(d.toISOString().split('T')[0]);
       }
       const results = await Promise.all(
-        past7.map(date => authFetch(`/api/v1/attendance/my?date=${date}`).then(r => r.json()))
+        past7.map(date => authFetch(`/attendance/my?date=${date}`).then(r => r.json()))
       );
       const records = results.map((res, i) => {
         const record = res.success
@@ -197,7 +197,7 @@ const EmployeeAttendance = () => {
     setError('');
 
     try {
-      const response = await fetch('/api/v1/upload', {
+      const response = await fetch('/upload', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: fileData

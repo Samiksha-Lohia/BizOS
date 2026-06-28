@@ -40,7 +40,7 @@ const Settings = () => {
     try {
       setLoading(true);
       setError('');
-      const response = await fetch('/api/v1/business', {
+      const response = await fetch('/business', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -85,7 +85,7 @@ const Settings = () => {
     setSuccess('');
 
     try {
-      const response = await fetch('/api/v1/upload', {
+      const response = await fetch('/upload', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -119,7 +119,7 @@ const Settings = () => {
     setSuccess('');
 
     try {
-      const response = await fetch('/api/v1/business', {
+      const response = await fetch('/business', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

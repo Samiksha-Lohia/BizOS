@@ -3,7 +3,7 @@ import Business from "../models/Business.model.js";
 import Employee from "../models/Employee.model.js";
 import Invoice from "../models/Invoice.model.js";
 
-// GET /api/v1/superadmin/stats — summary counts
+// GET /superadmin/stats — summary counts
 export const getSuperAdminStats = async (req, res) => {
   try {
     const totalAdmins = await User.countDocuments({ role: "Admin" });
@@ -36,7 +36,7 @@ export const getSuperAdminStats = async (req, res) => {
   }
 };
 
-// GET /api/v1/superadmin/admins — all Admin users with business + subscription
+// GET /superadmin/admins — all Admin users with business + subscription
 export const getAllAdmins = async (req, res) => {
   try {
     const admins = await User.find({ role: "Admin" }).lean();
@@ -82,7 +82,7 @@ export const getAllAdmins = async (req, res) => {
   }
 };
 
-// GET /api/v1/superadmin/admins/:adminId — detailed view of a single admin/business
+// GET /superadmin/admins/:adminId — detailed view of a single admin/business
 export const getAdminDetail = async (req, res) => {
   try {
     const { adminId } = req.params;
@@ -164,7 +164,7 @@ export const getAdminDetail = async (req, res) => {
   }
 };
 
-// PUT /api/v1/superadmin/admins/:adminId/subscription — update subscription
+// PUT /superadmin/admins/:adminId/subscription — update subscription
 export const updateSubscription = async (req, res) => {
   try {
     const { adminId } = req.params;

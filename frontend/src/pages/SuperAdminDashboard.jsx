@@ -77,7 +77,7 @@ const DetailModal = ({ adminId, onClose, authFetch }) => {
   useEffect(() => {
     const load = async () => {
       try {
-        const r = await authFetch(`/api/v1/superadmin/admins/${adminId}`);
+        const r = await authFetch(`/superadmin/admins/${adminId}`);
         const j = await r.json();
         if (j.success) {
           setDetail(j.data);
@@ -98,7 +98,7 @@ const DetailModal = ({ adminId, onClose, authFetch }) => {
   const handleSaveSub = async () => {
     setSaving(true);
     try {
-      await authFetch(`/api/v1/superadmin/admins/${adminId}/subscription`, {
+      await authFetch(`/superadmin/admins/${adminId}/subscription`, {
         method: 'PUT',
         body: JSON.stringify(subForm),
       });

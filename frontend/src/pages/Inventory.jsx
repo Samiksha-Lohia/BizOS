@@ -53,7 +53,7 @@ const Inventory = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const url = `/api/v1/products?search=${searchQuery}${filterLowStock ? '&lowStock=true' : ''}`;
+      const url = `/products?search=${searchQuery}${filterLowStock ? '&lowStock=true' : ''}`;
       const res = await authFetch(url);
       const result = await res.json();
       if (result.success) {
@@ -132,7 +132,7 @@ const Inventory = () => {
     setSuccess('');
 
     try {
-      const response = await authFetch(`/api/v1/products/${currentProduct._id}`, {
+      const response = await authFetch(`/products/${currentProduct._id}`, {
         method: 'PUT',
         body: JSON.stringify({
           name: formData.name,
@@ -164,7 +164,7 @@ const Inventory = () => {
     setSuccess('');
 
     try {
-      const response = await authFetch(`/api/v1/products/${currentProduct._id}/stock`, {
+      const response = await authFetch(`1/products/${currentProduct._id}/stock`, {
         method: 'POST',
         body: JSON.stringify({
           quantity: Number(stockAdjustment.quantity),
@@ -190,7 +190,7 @@ const Inventory = () => {
     setSuccess('');
 
     try {
-      const response = await authFetch(`/api/v1/products/${productId}`, {
+      const response = await authFetch(`/products/${productId}`, {
         method: 'DELETE'
       });
       const result = await response.json();

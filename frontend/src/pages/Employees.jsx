@@ -92,7 +92,7 @@ const Employees = ({ initialTab = 'directory' }) => {
         setError(empData.message || 'Could not load employees.');
       }
 
-      const attRes = await authFetch(`/api/v1/attendance?date=${todayStr}`);
+      const attRes = await authFetch(`/attendance?date=${todayStr}`);
       const attData = await attRes.json();
       if (attData.success) {
         setAttendanceRecords(attData.data || []);
@@ -156,7 +156,7 @@ const Employees = ({ initialTab = 'directory' }) => {
     setSuccess('');
 
     try {
-      const response = await authFetch(`/api/v1/employees/${currentEmployee._id}`, {
+      const response = await authFetch(`/employees/${currentEmployee._id}`, {
         method: 'PUT',
         body: JSON.stringify({
           name: formData.name,
@@ -191,7 +191,7 @@ const Employees = ({ initialTab = 'directory' }) => {
     setSuccess('');
 
     try {
-      const response = await authFetch(`/api/v1/employees/${employeeId}`, {
+      const response = await authFetch(`/employees/${employeeId}`, {
         method: 'DELETE'
       });
       const result = await response.json();
@@ -257,7 +257,7 @@ const Employees = ({ initialTab = 'directory' }) => {
     setError('');
 
     try {
-      const response = await fetch('/api/v1/upload', {
+      const response = await fetch('/upload', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -309,7 +309,7 @@ const Employees = ({ initialTab = 'directory' }) => {
     setPayroll([]);
     setError('');
     try {
-      const res = await authFetch(`/api/v1/attendance/payroll?month=${selectedMonth}`);
+      const res = await authFetch(`/attendance/payroll?month=${selectedMonth}`);
       const result = await res.json();
       if (result.success) {
         setPayroll(result.data);

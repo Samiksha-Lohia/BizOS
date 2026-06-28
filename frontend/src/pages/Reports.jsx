@@ -38,7 +38,7 @@ const Reports = () => {
     setError('');
     setReportData(null);
     try {
-      const url = `/api/v1/dashboard/reports?type=${reportType}&startDate=${startDate}&endDate=${endDate}`;
+      const url = `/dashboard/reports?type=${reportType}&startDate=${startDate}&endDate=${endDate}`;
       const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${token}`

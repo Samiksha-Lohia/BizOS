@@ -52,7 +52,7 @@ const Expenses = () => {
       setLoading(true);
       setError('');
       
-      let url = `/api/v1/expenses?`;
+      let url = `/expenses?`;
       if (categoryFilter) url += `category=${categoryFilter}&`;
       if (statusFilter) url += `status=${statusFilter}&`;
       
@@ -125,7 +125,7 @@ const Expenses = () => {
     setSuccess('');
 
     try {
-      const response = await fetch('/api/v1/upload', {
+      const response = await fetch('/upload', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -196,7 +196,7 @@ const Expenses = () => {
     if (reimburseVal) body.reimbursementStatus = reimburseVal;
 
     try {
-      const response = await authFetch(`/api/v1/expenses/${expenseId}/approve`, {
+      const response = await authFetch(`/expenses/${expenseId}/approve`, {
         method: 'PUT',
         body: JSON.stringify(body)
       });
