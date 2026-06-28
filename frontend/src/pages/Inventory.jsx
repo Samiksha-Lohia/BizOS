@@ -92,7 +92,7 @@ const Inventory = () => {
     setSuccess('');
 
     try {
-      const response = await authFetch('/api/v1/products', {
+      const response = await authFetch('/products', {
         method: 'POST',
         body: JSON.stringify({
           ...formData,

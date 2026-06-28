@@ -45,7 +45,7 @@ const EmployeeAttendance = () => {
 
   const fetchMyEmployee = async () => {
     try {
-      const res = await authFetch('/api/v1/employees/me');
+      const res = await authFetch('/employees/me');
       const data = await res.json();
       if (data.success && data.data) {
         setEmployeeId(data.data._id);
@@ -131,7 +131,7 @@ const EmployeeAttendance = () => {
     setError('');
     setSuccess('');
     try {
-      const res = await authFetch('/api/v1/attendance/check-in', {
+      const res = await authFetch('/attendance/check-in', {
         method: 'POST',
         body: JSON.stringify({
           employeeId,
@@ -162,7 +162,7 @@ const EmployeeAttendance = () => {
     setError('');
     setSuccess('');
     try {
-      const res = await authFetch('/api/v1/attendance/check-out', {
+      const res = await authFetch('/attendance/check-out', {
         method: 'POST',
         body: JSON.stringify({
           employeeId,

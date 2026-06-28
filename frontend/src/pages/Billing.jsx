@@ -56,9 +56,9 @@ const Billing = () => {
       setError('');
       
       const [invRes, custRes, prodRes] = await Promise.all([
-        authFetch('/api/v1/invoices'),
-        authFetch('/api/v1/customers'),
-        authFetch('/api/v1/products')
+        authFetch('/invoices'),
+        authFetch('/customers'),
+        authFetch('/products')
       ]);
 
       const [invData, custData, prodData] = await Promise.all([
@@ -185,7 +185,7 @@ const Billing = () => {
     }
 
     try {
-      const response = await authFetch('/api/v1/invoices', {
+      const response = await authFetch('/invoices', {
         method: 'POST',
         body: JSON.stringify({
           customerId: invoiceForm.customerId,
@@ -229,7 +229,7 @@ const Billing = () => {
     setSuccess('');
 
     try {
-      const response = await authFetch(`/api/v1/invoices/${invoiceId}/return`, {
+      const response = await authFetch(`/invoices/${invoiceId}/return`, {
         method: 'POST'
       });
       const result = await response.json();
@@ -259,7 +259,7 @@ const Billing = () => {
     setPayLoading(true);
     setPayError('');
     try {
-      const response = await authFetch(`/api/v1/invoices/${selectedInvoice._id}/pay`, {
+      const response = await authFetch(`/invoices/${selectedInvoice._id}/pay`, {
         method: 'POST',
         body: JSON.stringify({ amount: Number(payAmount) })
       });

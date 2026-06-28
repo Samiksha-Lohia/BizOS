@@ -258,8 +258,8 @@ const SuperAdminDashboard = () => {
     setLoading(true);
     try {
       const [statsRes, adminsRes] = await Promise.all([
-        authFetch('/api/v1/superadmin/stats'),
-        authFetch('/api/v1/superadmin/admins'),
+        authFetch('/superadmin/stats'),
+        authFetch('/superadmin/admins'),
       ]);
       const sj = await statsRes.json();
       const aj = await adminsRes.json();

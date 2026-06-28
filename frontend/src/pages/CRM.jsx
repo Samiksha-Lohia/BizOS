@@ -55,7 +55,7 @@ const CRM = () => {
     try {
       setLoading(true);
       setError('');
-      let url = `/api/v1/customers?search=${searchQuery}`;
+      let url = `/customers?search=${searchQuery}`;
       if (tagFilter) {
         url += `&tag=${tagFilter}`;
       }
@@ -90,7 +90,7 @@ const CRM = () => {
     setPaymentLoading(true);
 
     try {
-      const res = await authFetch(`/api/v1/customers/${currentCustomer._id}/pay`, {
+      const res = await authFetch(`/customers/${currentCustomer._id}/pay`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -127,7 +127,7 @@ const CRM = () => {
 
     try {
       const tagsArray = formData.tags.split(',').map(t => t.trim()).filter(Boolean);
-      const response = await authFetch('/api/v1/customers', {
+      const response = await authFetch('/customers', {
         method: 'POST',
         body: JSON.stringify({
           ...formData,
@@ -156,7 +156,7 @@ const CRM = () => {
 
     try {
       const tagsArray = formData.tags.split(',').map(t => t.trim()).filter(Boolean);
-      const response = await authFetch(`/api/v1/customers/${currentCustomer._id}`, {
+      const response = await authFetch(`/customers/${currentCustomer._id}`, {
         method: 'PUT',
         body: JSON.stringify({
           name: formData.name,
@@ -188,7 +188,7 @@ const CRM = () => {
     setSuccess('');
 
     try {
-      const response = await authFetch(`/api/v1/customers/${customerId}`, {
+      const response = await authFetch(`/customers/${customerId}`, {
         method: 'DELETE'
       });
       const result = await response.json();
@@ -209,7 +209,7 @@ const CRM = () => {
     setPurchasesLoading(true);
     setPurchases([]);
     try {
-      const res = await authFetch(`/api/v1/customers/${customer._id}/purchases`);
+      const res = await authFetch(`/customers/${customer._id}/purchases`);
       const result = await res.json();
       if (result.success) {
         setPurchases(result.data);

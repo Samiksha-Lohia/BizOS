@@ -83,7 +83,7 @@ const Employees = ({ initialTab = 'directory' }) => {
       setLoading(true);
       setError('');
       
-      const empRes = await authFetch('/api/v1/employees');
+      const empRes = await authFetch('/employees');
       const empData = await empRes.json();
 
       if (empData.success) {
@@ -121,7 +121,7 @@ const Employees = ({ initialTab = 'directory' }) => {
     setSuccess('');
 
     try {
-      const response = await authFetch('/api/v1/employees', {
+      const response = await authFetch('/employees', {
         method: 'POST',
         body: JSON.stringify({
           name: formData.name,
@@ -222,7 +222,7 @@ const Employees = ({ initialTab = 'directory' }) => {
     const timeIn = new Date().toTimeString().split(' ')[0].substring(0, 5);
 
     try {
-      const response = await authFetch('/api/v1/attendance/check-in', {
+      const response = await authFetch('/attendance/check-in', {
         method: 'POST',
         body: JSON.stringify({
           employeeId,
@@ -283,7 +283,7 @@ const Employees = ({ initialTab = 'directory' }) => {
     const timeOut = new Date().toTimeString().split(' ')[0].substring(0, 5);
 
     try {
-      const response = await authFetch('/api/v1/attendance/check-out', {
+      const response = await authFetch('/attendance/check-out', {
         method: 'POST',
         body: JSON.stringify({
           employeeId,

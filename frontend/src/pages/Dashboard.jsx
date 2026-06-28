@@ -23,7 +23,7 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const res = await authFetch('/api/v1/dashboard');
+      const res = await authFetch('/dashboard');
       const result = await res.json();
       if (result.success) {
         setData(result.data);

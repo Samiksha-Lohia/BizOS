@@ -73,7 +73,7 @@ const Expenses = () => {
   const fetchFinancials = async () => {
     try {
       setReportLoading(true);
-      const res = await authFetch('/api/v1/expenses/profit-loss');
+      const res = await authFetch('/expenses/profit-loss');
       const result = await res.json();
       if (result.success) {
         setProfitLoss(result.data);
@@ -87,7 +87,7 @@ const Expenses = () => {
 
   const fetchEmployees = async () => {
     try {
-      const res = await authFetch('/api/v1/employees');
+      const res = await authFetch('/employees');
       const result = await res.json();
       if (result.success) {
         setEmployees(result.data.filter(e => e.status === 'Active'));
@@ -152,7 +152,7 @@ const Expenses = () => {
     setSuccess('');
 
     try {
-      const response = await authFetch('/api/v1/expenses', {
+      const response = await authFetch('/expenses', {
         method: 'POST',
         body: JSON.stringify({
           ...formData,
