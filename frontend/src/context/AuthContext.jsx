@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch(url, {
+    const response = await fetch(`${API_URL}${url}`, {
       ...options,
       headers,
     });
