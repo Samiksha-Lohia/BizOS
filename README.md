@@ -22,22 +22,32 @@ BizOS is an all-in-one Business Operating System built to digitize day-to-day op
 MSME/
 ├── backend/                  # Node.js + Express REST API
 │   ├── src/
-│   │   ├── controllers/      # Business logic (invoices, inventory, CRM, etc.)
-│   │   ├── models/           # Mongoose schemas & models
-│   │   ├── routes/           # Express route definitions
-│   │   └── middleware/       # Auth guards, role checks
-│   ├── app.js                # Express app configuration (CORS, Helmet, rate limiting)
+│   │   ├── config/           # Database connection & setup
+│   │   ├── controllers/      # Business logic controllers (invoices, inventory, CRM, etc.)
+│   │   ├── docs/             # Swagger and internal API documentation
+│   │   ├── middlewares/      # Express middlewares (Auth guards, file upload)
+│   │   ├── models/           # Mongoose schemas & models (User, Business, Product, etc.)
+│   │   ├── routes/           # Express router endpoints
+│   │   ├── seed/             # DB seeding scripts for mock data setup
+│   │   ├── services/         # Third-party integrations & utilities
+│   │   ├── uploads/          # Static file uploads directory
+│   │   └── utils/            # Helper classes, error formats, and constants
+│   ├── app.js                # Express app setup (cors, helmet, rate limiting)
 │   ├── constants.js          # Shared app-wide constants
 │   ├── package.json
 │   └── .env                  # Environment variables (not committed)
 │
 ├── frontend/                 # React + Vite client application
 │   ├── src/
-│   │   ├── pages/            # Full-page views (Dashboard, Inventory, Billing, etc.)
-│   │   ├── components/       # Reusable UI components
-│   │   ├── context/          # React Context providers (Auth, Business)
-│   │   ├── App.jsx           # Root app with routing
-│   │   └── App.css           # Global styles & design system
+│   │   ├── assets/           # Client-side static assets (icons, brand logos)
+│   │   ├── components/       # Shared UI layouts and components (DashboardLayout, etc.)
+│   │   ├── context/          # React Context providers (AuthContext, ThemeContext)
+│   │   ├── pages/            # View pages (Billing, CRM, Dashboard, Expenses, etc.)
+│   │   ├── utils/            # Helper files (sidebar route mappings)
+│   │   ├── App.css           # Global stylesheet and premium theme variables
+│   │   ├── App.jsx           # Root app with React Router configuration
+│   │   ├── index.css         # Foundational CSS reset styles
+│   │   └── main.jsx          # React renderer entrypoint
 │   ├── index.html
 │   └── package.json
 │
@@ -100,28 +110,32 @@ The Vite dev server will start at **`http://localhost:5173`**.
 
 ## API Overview
 
-All endpoints are versioned under `/api/v1/` and protected by JWT authentication.
+All endpoints are versioned under `/api/v1/` and protected by JWT authentication (excluding public login/register routes).
 
-| Resource | Base Route |
-|---|---|
-| Auth | `/api/v1/auth` |
-| Business | `/api/v1/business` |
-| Products | `/api/v1/products` |
-| Invoices | `/api/v1/invoices` |
-| Customers | `/api/v1/customers` |
-| Employees | `/api/v1/employees` |
-| Attendance | `/api/v1/attendance` |
-| Expenses | `/api/v1/expenses` |
-| Dashboard | `/api/v1/dashboard` |
+| Resource | Base Route | Description / Access Rules |
+|---|---|---|
+| Auth | `/api/v1/auth` | Public signup/login, protected logout, session checks |
+| SuperAdmin | `/api/v1/superadmin` | Platform diagnostics, business stats, subscription updates (SuperAdmin only) |
+| Business | `/api/v1/business` | Manage business profile configurations (Admin only) |
+| Products | `/api/v1/products` | Stock adjustments, full CRUD (Admin, Manager, Staff) |
+| Invoices | `/api/v1/invoices` | Checkout invoicing, returns, payment records (Admin, Manager, Staff) |
+| Customers | `/api/v1/customers` | Customer profiling, outstanding logs, loyalty points ledger (Admin, Manager, Staff) |
+| Employees | `/api/v1/employees` | Internal roster management (Admin, Manager, Accountant) |
+| Attendance | `/api/v1/attendance` | Daily check-in/out, GPS selfie punch logs, payroll report sheets |
+| Expenses | `/api/v1/expenses` | Claim processing, utility bills, categories, profit & loss reports |
+| Dashboard | `/api/v1/dashboard` | Main metrics tracking dashboards (Admin, Manager, Accountant) |
+| Upload | `/api/v1/upload` | File attachment upload utility (receipts, logo files, etc.) |
 
 ## Role-Based Access
 
 | Role | Access Level |
 |---|---|
-| **Admin** | Full CRUD on all resources |
-| **Manager** | Operations, stock, attendance approvals, expense confirmations |
-| **Staff** | Invoice creation, CRM logging, self punch-in/out |
-| **Accountant** | Financial reports, GST summaries, payroll review |
+| **SuperAdmin** | System-wide dashboard statistics. Manage business accounts and subscription status. Cannot access business modules. |
+| **Admin** | Owner account. Full CRUD capabilities on all business resources, setup profile, employee management, payroll control. |
+| **Manager** | Operational management. Roster editing, product catalog setup, invoice checks, expense approvals, analytics review. |
+| **Staff** | Daily operator. Inventory check, invoice processing, CRM editing, self-attendance logs, expense logging. |
+| **Employee** | Daily staff member. Log selfie/GPS attendance, view own profile statistics, view own attendance logs. |
+| **Accountant** | Financial audit access. Read-only on CRM and roster, view sales reports, log/approve expenses, verify payroll sheets. |
 
 ---
 

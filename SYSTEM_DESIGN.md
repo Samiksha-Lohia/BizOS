@@ -10,11 +10,27 @@ BizOS is designed as a monolithic RESTful API built on the **MVC (Model-View-Con
 
 ```mermaid
 graph TD
-    Client[Client App: Mobile/Web] -->|HTTP Requests| AppJS[app.js: Middleware, Cors, Helmet]
-    AppJS -->|Router Guard| AuthMW[auth.middleware.js]
-    AuthMW -->|Delegates| Routes[Express Routes]
-    Routes -->|Calls| Controllers[Controllers: Business Logic]
-    Controllers -->|Queries| Models[Mongoose Models]
+    Client[Client App: Mobile/Web] -->|HTTP Requests| AppJS[app.js: Middleware, CORS, Helmet, Rate Limits]
+    
+    subgraph Route Guard Pipeline
+        AppJS --> AuthMW[auth.middleware.js]
+        AuthMW -->|protect| RoleGuard{Role Check}
+    end
+
+    subgraph Router Mapping
+        RoleGuard -->|requireSuperAdmin| SuperAdminRoutes[SuperAdmin Routes: /api/v1/superadmin]
+        RoleGuard -->|blockSuperAdmin| BusinessRoutes[Business Modules: /api/v1/business, /products, /invoices, /customers, /employees, /attendance, /expenses, /dashboard]
+        RoleGuard -->|protect only| UploadRoutes[Upload Routes: /api/v1/upload]
+    end
+
+    SuperAdminRoutes -->|Calls| SuperAdminCtrl[superAdmin.controller.js]
+    BusinessRoutes -->|Calls| BusinessCtrls[Controllers: business, product, invoice, CRM, employee, attendance, expense, dashboard]
+    UploadRoutes -->|multer upload| UploadHandler[upload.routes.js handler]
+
+    SuperAdminCtrl -->|Queries| Models[Mongoose Models]
+    BusinessCtrls -->|Queries| Models
+    UploadHandler -->|Writes File| LocalUploads[src/uploads Static Storage]
+
     Models -->|Reads/Writes| MongoDB[(MongoDB Database)]
 ```
 
@@ -58,15 +74,21 @@ erDiagram
 - `logo`: String (URL)
 - `phone`: String
 - `email`: String
-- `owner`: ObjectId (Ref -> User)
+- `owner`: ObjectId (Ref -> User, Required)
+- `subscription`: Sub-document containing:
+  - `plan`: String (Enum: `Free`, `Basic`, `Pro`, `Enterprise`, Default: `Free`)
+  - `status`: String (Enum: `Trial`, `Active`, `Expired`, Default: `Trial`)
+  - `startDate`: Date (Default: null)
+  - `endDate`: Date (Default: null)
 
 #### 2. User
 - `_id`: ObjectId
-- `name`: String (Required)
-- `email`: String (Required, unique)
-- `password`: String (Required, select: false)
-- `role`: String (Enum: `Admin`, `Manager`, `Staff`, `Accountant`)
-- `phone`: String
+- `name`: String (Required, trimmed)
+- `email`: String (Required, unique, lowercase, trimmed)
+- `password`: String (Required, minlength: 6, select: false)
+- `role`: String (Enum: `Admin`, `Manager`, `Staff`, `Employee`, `Accountant`, `SuperAdmin`, Default: `Admin`)
+- `phone`: String (Trimmed)
+- `designation`: String (Default: null)
 - `businessId`: ObjectId (Ref -> Business)
 
 #### 3. Product (Inventory catalog)
@@ -195,8 +217,10 @@ sequenceDiagram
 ```
 
 ### B. Daily Attendance selfie & GPS punch-in
-- Staff punch check-in from their app -> check-in logs longitude/latitude coordinates.
-- Punch-out records timestamp, evaluates total duration against Employee standard `workingHours`, and logs decimal `overtimeHours`.
+- **Check-In (`POST /api/v1/attendance/check-in`)**: Logs daily employee check-in details. Requires `employeeId`, `date` (YYYY-MM-DD), and records optional fields: `timeIn` (defaults to current server time `HH:MM`), `selfieUrl` (image upload URL for validation), and `gpsCoordinates` (longitude & latitude coordinates). Employees are restricted to only checking in for themselves.
+- **Check-Out (`POST /api/v1/attendance/check-out`)**: Logs daily check-out details. If check-in exists, sets `timeOut` (defaults to current server time `HH:MM`). Calculates decimal hours worked based on `timeIn` and `timeOut`:
+  $$\text{Hours Worked} = (\text{Out Hour} + \frac{\text{Out Minute}}{60}) - (\text{In Hour} + \frac{\text{In Minute}}{60})$$
+  If the calculated hours exceed the standard work day (`workingHours`, default: 8) defined in the employee's salary settings, the difference is saved as `overtimeHours`.
 
 ### C. Monthly Payroll Wages Calculation
 At month end:
@@ -215,16 +239,22 @@ At month end:
 ## 4. Security & Optimization Features
 
 ### Security Controls
-- **Bcrypt Hashing**: User passwords are encrypted with salt level 10 before write database commits.
+- **Bcrypt Hashing**: User passwords are automatically hashed with a salt factor of 10 prior to DB persistence (`pre-save` Mongoose hook).
 - **Strict Rate Limiting**:
-  - Auth Endpoints: Capped at 20 requests per 15 minutes to thwart brute-force login hacks.
-  - General API: Capped at 300 requests per 15 minutes.
-- **Helmet Headers**: Exposes safe cross-origin resource sharing, framing restrictions, and prevents XSS.
-- **Role authorization check**: Endpoint restrictions filter requests:
-  - *Admin*: All CRUD resources.
-  - *Manager*: Core operations, stock modifications, attendance approvals, expense confirmations.
-  - *Staff*: Invoices creation, customer CRM logging, self check-in punch operations.
-  - *Accountant*: Financial cash-flow reporting views, GST summaries audits, Employee payroll review.
+  - Auth Endpoints: Capped at 100 requests per 15 minutes to prevent brute-force attacks (`authLimiter`).
+  - General API Endpoints: Capped at 300 requests per 15 minutes (`apiLimiter`).
+- **Helmet Headers**: Exposes cross-origin resource policies, script injection guards (XSS), and frame-guard protections.
+- **Route guards & validation**:
+  - `protect`: Validates incoming authorization header (`Bearer <token>`) or cookie, attaching current user to `req.user`.
+  - `requireSuperAdmin`: Restricts access exclusively to the system administrator for platform metrics and billing updates.
+  - `blockSuperAdmin`: Blocks `SuperAdmin` from access to standard MSME tenant features.
+- **Role authorization check (`authorizeRoles`)**: Filters and controls route access dynamically:
+  - *SuperAdmin*: Tenant statistics summaries, subscription plan updates.
+  - *Admin*: Absolute operational CRUD control, business profile settings.
+  - *Manager*: Core inventory adjustment, client invoice check/returns, attendance details, claim approvals.
+  - *Staff*: Invoice creation, product creation, customer ledger tracking, selfie/GPS check-in/out, expense logging.
+  - *Employee*: GPS selfie check-in/out, own attendance retrieval, own employee profile check.
+  - *Accountant*: Read-only catalog details, financial audits (expenses, profit & loss, reports, payroll sheets).
 
 ### Database Indexing Strategy
 We implement composite index configurations to ensure fast queries:
