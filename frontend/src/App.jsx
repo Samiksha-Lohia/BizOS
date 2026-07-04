@@ -1,9 +1,10 @@
-﻿import React from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Sun, Moon, Package, Loader2 } from 'lucide-react';
-import { ThemeProvider, useTheme } from './context/ThemeContext';
+import { Package, Loader2 } from 'lucide-react';
+import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { getFirstSidebarPath } from './utils/navigation';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -79,13 +80,23 @@ function BlockSuperAdmin({ children }) {
 
 const EMPLOYEE_ROLES = ['Staff', 'Employee'];
 
-// Blocks employee accounts from admin-only pages — redirects to Billing
+// Blocks employee accounts from admin-only pages — redirects to their default page
 function StaffGuard({ children }) {
   const { user } = useAuth();
   if (EMPLOYEE_ROLES.includes(user?.role)) {
-    return <Navigate to="/dashboard/billing" replace />;
+    const defaultPath = getFirstSidebarPath(user?.role, false);
+    return <Navigate to={defaultPath} replace />;
   }
   return children;
+}
+
+function DashboardIndexRoute() {
+  const { user } = useAuth();
+  const defaultPath = getFirstSidebarPath(user?.role, false);
+  if (defaultPath !== '/dashboard') {
+    return <Navigate to={defaultPath} replace />;
+  }
+  return <Dashboard />;
 }
 
 function AttendanceRoute() {
@@ -98,8 +109,19 @@ function AttendanceRoute() {
 
 function AppContent() {
   const location = useLocation();
-  const { theme, toggleTheme } = useTheme();
   const showHeaderFooter = location.pathname === '/';
+
+  React.useEffect(() => {
+    const handleWheel = (e) => {
+      if (document.activeElement && document.activeElement.type === 'number') {
+        document.activeElement.blur();
+      }
+    };
+    document.addEventListener('wheel', handleWheel, { passive: true });
+    return () => {
+      document.removeEventListener('wheel', handleWheel);
+    };
+  }, []);
 
   return (
     <div className="app-container">
@@ -120,9 +142,6 @@ function AppContent() {
               <li><a href="#contact" className="nav-link">Contact</a></li>
             </ul>
             <div className="nav-actions">
-              <button onClick={toggleTheme} className="theme-toggle-btn" aria-label="Toggle Theme">
-                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-              </button>
               <Link to="/login"><button className="btn btn-ghost">Sign In</button></Link>
               <Link to="/register"><button className="btn btn-primary">Get Started</button></Link>
             </div>
@@ -160,6 +179,7 @@ function AppContent() {
           }>
             <Route index element={<SuperAdminDashboard />} />
             <Route path="businesses" element={<SuperAdminDashboard />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
 
           {/* ── Regular Dashboard Routes ── */}
@@ -170,14 +190,14 @@ function AppContent() {
               </BlockSuperAdmin>
             </ProtectedRoute>
           }>
-            <Route index element={<StaffGuard><Dashboard /></StaffGuard>} />
+            <Route index element={<DashboardIndexRoute />} />
             <Route path="inventory" element={<Inventory />} />
             <Route path="billing" element={<Billing />} />
             <Route path="crm" element={<StaffGuard><CRM /></StaffGuard>} />
             <Route path="employees" element={<StaffGuard><Employees /></StaffGuard>} />
             <Route path="expenses" element={<StaffGuard><Expenses /></StaffGuard>} />
             <Route path="reports" element={<StaffGuard><Reports /></StaffGuard>} />
-            <Route path="settings" element={<StaffGuard><Settings /></StaffGuard>} />
+            <Route path="settings" element={<Settings />} />
             <Route path="attendance" element={<AttendanceRoute />} />
           </Route>
 

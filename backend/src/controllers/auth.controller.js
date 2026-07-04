@@ -191,3 +191,42 @@ export const getMe = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const updateProfile = async (req, res) => {
+  const { name, email, password } = req.body;
+
+  try {
+    const user = await User.findById(req.user._id).select("+password");
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    if (email && email !== user.email) {
+      const emailExists = await User.findOne({ email });
+      if (emailExists) {
+        return res.status(400).json({ success: false, message: "Email already in use" });
+      }
+      user.email = email;
+    }
+
+    if (name) user.name = name;
+    if (password) user.password = password;
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      data: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        designation: user.designation || null,
+        businessId: user.businessId || null,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};

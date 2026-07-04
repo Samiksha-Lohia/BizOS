@@ -394,8 +394,8 @@ const EmployeeAttendance = () => {
               // Checked in but not yet checked out
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', width: '100%', maxWidth: '340px' }}>
                 <div style={{
-                  background: 'var(--accent-green-bg, rgba(52,199,89,0.1))',
-                  border: '1px solid var(--accent-green, #34c759)',
+                  background: 'var(--suc-bg)',
+                  border: '1px solid var(--suc)',
                   borderRadius: 'var(--radius-md)',
                   padding: '12px 20px',
                   display: 'flex',
@@ -403,7 +403,7 @@ const EmployeeAttendance = () => {
                   gap: '10px',
                   width: '100%'
                 }}>
-                  <CheckCircle size={20} color="var(--accent-green, #34c759)" />
+                  <CheckCircle size={20} color="var(--suc)" />
                   <div>
                     <div style={{ fontWeight: 600, fontSize: '14px' }}>Checked In at {todayRecord?.timeIn}</div>
                     <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Shift in progress...</div>
@@ -423,19 +423,20 @@ const EmployeeAttendance = () => {
             ) : isCheckedOut ? (
               // Fully done for the day
               <div style={{
-                background: 'var(--surface-2, rgba(255,255,255,0.05))',
+                background: 'var(--bg3)',
+                border: '1px solid var(--bd)',
                 borderRadius: 'var(--radius-md)',
                 padding: '20px 24px',
                 textAlign: 'center',
                 maxWidth: '340px',
                 width: '100%'
               }}>
-                <CheckCircle size={36} color="var(--accent-green, #34c759)" style={{ marginBottom: '10px' }} />
+                <CheckCircle size={36} color="var(--suc)" style={{ marginBottom: '10px' }} />
                 <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '4px' }}>Day Complete!</div>
                 <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
                   In: <strong>{todayRecord?.timeIn}</strong> &nbsp;|&nbsp; Out: <strong>{todayRecord?.timeOut}</strong>
                   {todayRecord?.overtimeHours > 0 && (
-                    <div style={{ color: 'var(--accent-green)', marginTop: '4px' }}>Overtime: {todayRecord.overtimeHours} hrs</div>
+                    <div style={{ color: 'var(--suc)', marginTop: '4px' }}>Overtime: {todayRecord.overtimeHours} hrs</div>
                   )}
                 </div>
               </div>
@@ -472,21 +473,21 @@ const EmployeeAttendance = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--accent-green, #34c759)', display: 'inline-block' }} />
+                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--suc)', display: 'inline-block' }} />
                     Present
                   </span>
                   <strong>{presentDays} days</strong>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--info, #007aff)', display: 'inline-block' }} />
+                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--inf)', display: 'inline-block' }} />
                     Half Day
                   </span>
                   <strong>{halfDays} days</strong>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--accent-red, #ff3b30)', display: 'inline-block' }} />
+                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--alr)', display: 'inline-block' }} />
                     Absent
                   </span>
                   <strong>{absentDays} days</strong>
@@ -502,11 +503,11 @@ const EmployeeAttendance = () => {
                       flex: 1,
                       height: '8px',
                       borderRadius: '4px',
-                      background: h.record?.status === 'Present' ? 'var(--accent-green, #34c759)' :
-                                  h.record?.status === 'Half Day' ? 'var(--info, #007aff)' :
-                                  h.record?.status === 'Absent' ? 'var(--accent-red, #ff3b30)' :
-                                  h.record?.status === 'Leave' ? 'var(--warning, #ff9500)' :
-                                  'var(--border-color, rgba(255,255,255,0.1))'
+                      background: h.record?.status === 'Present' ? 'var(--suc)' :
+                                  h.record?.status === 'Half Day' ? 'var(--inf)' :
+                                  h.record?.status === 'Absent' ? 'var(--alr)' :
+                                  h.record?.status === 'Leave' ? 'var(--wrn)' :
+                                  'var(--bd)'
                     }}
                   />
                 ))}
@@ -533,7 +534,7 @@ const EmployeeAttendance = () => {
                         alignItems: 'center',
                         padding: '8px 12px',
                         borderRadius: 'var(--radius-sm)',
-                        background: i === 0 ? 'var(--primary-light, rgba(102,126,234,0.1))' : 'var(--surface-2, rgba(255,255,255,0.03))',
+                        background: i === 0 ? 'var(--pri-l)' : 'var(--bg3)',
                         fontSize: '13px'
                       }}
                     >

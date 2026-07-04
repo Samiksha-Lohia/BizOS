@@ -91,9 +91,10 @@ export const getPurchaseHistory = async (req, res) => {
 };
 
 export const recordCustomerPayment = async (req, res) => {
-  const { amount } = req.body;
-  if (amount === undefined || amount <= 0) {
-    return res.status(400).json({ success: false, message: "Please provide a valid payment amount." });
+  const { amount, type = "pay" } = req.body;
+
+  if (amount === undefined || amount < 0) {
+    return res.status(400).json({ success: false, message: "Please provide a valid amount." });
   }
 
   try {
@@ -102,46 +103,72 @@ export const recordCustomerPayment = async (req, res) => {
       return res.status(404).json({ success: false, message: "Customer not found." });
     }
 
-    // Find outstanding invoices for this customer, oldest first
-    const invoices = await Invoice.find({
-      customerId: customer._id,
-      businessId: req.user.businessId,
-      outstandingAmount: { $gt: 0 },
-      status: { $ne: "Returned" },
-    }).sort({ createdAt: 1 });
+    let paymentAmount = 0;
+    const oldBalance = customer.outstandingBalance;
 
-    let remaining = amount;
-    const updatedInvoices = [];
-
-    for (let invoice of invoices) {
-      if (remaining <= 0) break;
-      const unpaid = invoice.outstandingAmount;
-      if (remaining >= unpaid) {
-        invoice.paidAmount += unpaid;
-        invoice.outstandingAmount = 0;
-        invoice.status = "Paid";
-        remaining -= unpaid;
-      } else {
-        invoice.paidAmount += remaining;
-        invoice.outstandingAmount -= remaining;
-        invoice.status = "Partially Paid";
-        remaining = 0;
+    if (type === "pay") {
+      paymentAmount = Number(amount);
+      if (paymentAmount <= 0) {
+        return res.status(400).json({ success: false, message: "Payment amount must be greater than zero." });
       }
-      await invoice.save();
-      updatedInvoices.push(invoice);
+      if (paymentAmount > oldBalance) {
+        return res.status(400).json({ success: false, message: "Payment amount cannot exceed outstanding dues." });
+      }
+      customer.outstandingBalance = Math.max(0, oldBalance - paymentAmount);
+    } else if (type === "set") {
+      const newBalance = Number(amount);
+      if (newBalance < 0) {
+        return res.status(400).json({ success: false, message: "Dues balance cannot be negative." });
+      }
+      if (newBalance < oldBalance) {
+        paymentAmount = oldBalance - newBalance;
+      }
+      customer.outstandingBalance = newBalance;
+    } else {
+      return res.status(400).json({ success: false, message: "Invalid payment type." });
     }
 
-    // Deduct the payment from customer's outstanding balance
-    customer.outstandingBalance = Math.max(0, customer.outstandingBalance - amount);
+    let updatedInvoicesCount = 0;
+    if (paymentAmount > 0) {
+      // Find outstanding invoices for this customer, oldest first
+      const invoices = await Invoice.find({
+        customerId: customer._id,
+        businessId: req.user.businessId,
+        outstandingAmount: { $gt: 0 },
+        status: { $ne: "Returned" },
+      }).sort({ createdAt: 1 });
+
+      let remaining = paymentAmount;
+      for (let invoice of invoices) {
+        if (remaining <= 0) break;
+        const unpaid = invoice.outstandingAmount;
+        if (remaining >= unpaid) {
+          invoice.paidAmount += unpaid;
+          invoice.outstandingAmount = 0;
+          invoice.status = "Paid";
+          remaining -= unpaid;
+        } else {
+          invoice.paidAmount += remaining;
+          invoice.outstandingAmount -= remaining;
+          invoice.status = "Partially Paid";
+          remaining = 0;
+        }
+        await invoice.save();
+        updatedInvoicesCount++;
+      }
+    }
+
     await customer.save();
 
     return res.status(200).json({
       success: true,
-      message: `Successfully recorded payment of ₹${amount}.`,
+      message: type === "set"
+        ? `Successfully updated dues balance to ₹${customer.outstandingBalance.toLocaleString('en-IN')}.`
+        : `Successfully recorded payment of ₹${paymentAmount.toLocaleString('en-IN')}.`,
       data: {
         customer,
-        allocatedAmount: amount - remaining,
-        updatedInvoicesCount: updatedInvoices.length
+        allocatedAmount: paymentAmount,
+        updatedInvoicesCount
       }
     });
   } catch (error) {

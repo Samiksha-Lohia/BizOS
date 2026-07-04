@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield, Users, CheckCircle, XCircle, Clock, Building2,
@@ -139,7 +139,7 @@ const DetailModal = ({ adminId, onClose, authFetch }) => {
               <div className="sa-detail-grid">
                 <div className="sa-detail-item"><span>Name</span><strong>{detail.admin.name}</strong></div>
                 <div className="sa-detail-item"><span>Email</span><strong>{detail.admin.email}</strong></div>
-                <div className="sa-detail-item"><span>Phone</span><strong>{detail.admin.phone}</strong></div>
+                <div className="sa-detail-item"><span>Phone</span><strong>{detail.admin.phone || detail.business?.phone || '—'}</strong></div>
                 <div className="sa-detail-item"><span>Registered</span><strong>{fmtDate(detail.admin.registeredAt)}</strong></div>
               </div>
             </div>
@@ -150,10 +150,10 @@ const DetailModal = ({ adminId, onClose, authFetch }) => {
                 <div className="sa-detail-section-title"><Building2 size={14} /> Business Details</div>
                 <div className="sa-detail-grid">
                   <div className="sa-detail-item"><span>Business Name</span><strong>{detail.business.name}</strong></div>
-                  <div className="sa-detail-item"><span>GSTIN</span><strong>{detail.business.gstin}</strong></div>
-                  <div className="sa-detail-item"><span>Phone</span><strong>{detail.business.phone}</strong></div>
-                  <div className="sa-detail-item"><span>Email</span><strong>{detail.business.email}</strong></div>
-                  <div className="sa-detail-item"><span>Address</span><strong>{detail.business.address}</strong></div>
+                  <div className="sa-detail-item"><span>GSTIN</span><strong>{detail.business.gstin || '—'}</strong></div>
+                  <div className="sa-detail-item"><span>Phone</span><strong>{detail.admin.phone || detail.business.phone || '—'}</strong></div>
+                  <div className="sa-detail-item"><span>Email</span><strong>{detail.business.email || '—'}</strong></div>
+                  <div className="sa-detail-item"><span>Address</span><strong>{detail.business.address || '—'}</strong></div>
                   <div className="sa-detail-item"><span>Created</span><strong>{fmtDate(detail.business.createdAt)}</strong></div>
                 </div>
               </div>
@@ -205,37 +205,6 @@ const DetailModal = ({ adminId, onClose, authFetch }) => {
                 </div>
               )}
             </div>
-
-            {/* Stats */}
-            <div className="sa-detail-section">
-              <div className="sa-detail-section-title"><BarChart3 size={14} /> Module Stats</div>
-              <div className="sa-stats-row">
-                <div className="sa-mini-stat"><Users size={16} /><div><strong>{detail.employeeCount}</strong><span>Employees</span></div></div>
-                <div className="sa-mini-stat"><FileText size={16} /><div><strong>{detail.invoiceSummary?.totalInvoices || 0}</strong><span>Invoices</span></div></div>
-                <div className="sa-mini-stat"><TrendingUp size={16} /><div><strong>₹{fmt(detail.invoiceSummary?.totalRevenue)}</strong><span>Total Revenue</span></div></div>
-                <div className="sa-mini-stat"><CheckCircle size={16} /><div><strong>₹{fmt(detail.invoiceSummary?.paidRevenue)}</strong><span>Paid Revenue</span></div></div>
-              </div>
-            </div>
-
-            {/* Employees list */}
-            {detail.employees?.length > 0 && (
-              <div className="sa-detail-section">
-                <div className="sa-detail-section-title"><Users size={14} /> Employees ({detail.employeeCount})</div>
-                <div className="sa-emp-list">
-                  {detail.employees.slice(0, 8).map(emp => (
-                    <div key={emp.id} className="sa-emp-row">
-                      <span className="sa-emp-avatar">{emp.name?.[0]?.toUpperCase()}</span>
-                      <span className="sa-emp-name">{emp.name}</span>
-                      <span className="sa-emp-role">{emp.role}</span>
-                      <span className={`sa-emp-status ${emp.status === 'Active' ? 'active' : 'inactive'}`}>{emp.status}</span>
-                    </div>
-                  ))}
-                  {detail.employees.length > 8 && (
-                    <div className="sa-emp-more">+{detail.employees.length - 8} more employees</div>
-                  )}
-                </div>
-              </div>
-            )}
           </div>
         )}
       </motion.div>
@@ -283,18 +252,6 @@ const SuperAdminDashboard = () => {
 
   return (
     <div className="sa-page">
-      {/* Header */}
-      <div className="sa-page-header">
-        <div>
-          <h1 className="sa-page-title">System Overview</h1>
-          <p className="sa-page-subtitle">Monitor all registered businesses and subscription status</p>
-        </div>
-        <button className="sa-refresh-btn" onClick={loadData} disabled={loading}>
-          <RefreshCw size={15} className={loading ? 'sa-spin' : ''} />
-          <span>Refresh</span>
-        </button>
-      </div>
-
       {/* Stat Cards */}
       <div className="sa-stats-grid">
         <StatCard label="Total Businesses" value={stats?.totalAdmins ?? '—'} icon={Building2} color="#6366f1" sub="Registered admins" />

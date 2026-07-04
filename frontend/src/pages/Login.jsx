@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, ArrowLeft, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { getFirstSidebarPath } from '../utils/navigation';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -40,13 +41,8 @@ const Login = () => {
       const res = await login(email, password);
       if (res.success) {
         setSuccess('Welcome back! Redirecting...');
-        if (res.isSuperAdmin) {
-          navigate('/superadmin');
-        } else if (res.role && ['Staff', 'Employee'].includes(res.role)) {
-          navigate('/dashboard/billing');
-        } else {
-          navigate('/dashboard');
-        }
+        const path = getFirstSidebarPath(res.role, res.isSuperAdmin);
+        navigate(path);
       } else {
         setError(res.message || 'Invalid email or password.');
       }

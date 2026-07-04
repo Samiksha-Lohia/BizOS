@@ -5,6 +5,7 @@ import app from "../app.js";
 import connectDB from "./config/db.js";
 import mongoose from "mongoose";
 import { seedSuperAdmin } from "./seed/superAdmin.seed.js";
+import { autoCheckoutPendingEmployees, scheduleMidnightCheckout } from "./services/cron.service.js";
 
 const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.NODE_ENV || "development";
@@ -12,8 +13,12 @@ const NODE_ENV = process.env.NODE_ENV || "development";
 const startServer = async () => {
   try {
     await connectDB();
-    // Seed the hardcoded SuperAdmin account
+    // Seed the SuperAdmin account
     await seedSuperAdmin();
+
+    // Run boot check for auto-checkout and schedule daily midnight check
+    await autoCheckoutPendingEmployees();
+    scheduleMidnightCheckout();
 
     const server = app.listen(PORT, () => {
       console.log("─────────────────────────────────────────");

@@ -98,8 +98,13 @@ export const adjustStock = async (req, res) => {
         return res.status(400).json({ success: false, message: "Insufficient stock quantity" });
       }
       product.stockQuantity -= qty;
+    } else if (type === "set") {
+      if (qty < 0) {
+        return res.status(400).json({ success: false, message: "Stock quantity cannot be negative" });
+      }
+      product.stockQuantity = qty;
     } else {
-      return res.status(400).json({ success: false, message: "Invalid type. Must be 'in' or 'out'" });
+      return res.status(400).json({ success: false, message: "Invalid type. Must be 'in', 'out' or 'set'" });
     }
 
     await product.save();

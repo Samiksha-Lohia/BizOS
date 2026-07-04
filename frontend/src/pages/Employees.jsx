@@ -371,30 +371,38 @@ const Employees = ({ initialTab = 'directory' }) => {
       {success && <div className="success-message"><AlertTriangle size={16} /> {success}</div>}
 
       {/* Tabs Row */}
-      <div className="glass-panel" style={{ display: 'flex', padding: '6px', gap: '8px' }}>
-        <button 
-          className={`btn ${activeTab === 'directory' ? 'btn-primary' : 'btn-ghost'}`} 
-          style={{ borderRadius: 'var(--radius-md)', padding: '8px 16px' }}
-          onClick={() => setActiveTab('directory')}
-        >
-          <Users size={16} /> Staff Directory
-        </button>
-        {canManageAttendance && (
-          <button
-            className={`btn ${activeTab === 'attendance' ? 'btn-primary' : 'btn-ghost'}`}
+      <div className="glass-panel" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 12px', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button 
+            className={`btn ${activeTab === 'directory' ? 'btn-primary' : 'btn-ghost'}`} 
             style={{ borderRadius: 'var(--radius-md)', padding: '8px 16px' }}
-            onClick={() => setActiveTab('attendance')}
+            onClick={() => setActiveTab('directory')}
           >
-            <Calendar size={16} /> Attendance
+            <Users size={16} /> Staff Directory
           </button>
-        )}
-        {canViewPayroll && (
-          <button
-            className={`btn ${activeTab === 'payroll' ? 'btn-primary' : 'btn-ghost'}`}
-            style={{ borderRadius: 'var(--radius-md)', padding: '8px 16px' }}
-            onClick={() => setActiveTab('payroll')}
-          >
-            <DollarSign size={16} /> Payroll & Salaries
+          {canManageAttendance && (
+            <button
+              className={`btn ${activeTab === 'attendance' ? 'btn-primary' : 'btn-ghost'}`}
+              style={{ borderRadius: 'var(--radius-md)', padding: '8px 16px' }}
+              onClick={() => setActiveTab('attendance')}
+            >
+              <Calendar size={16} /> Attendance
+            </button>
+          )}
+          {canViewPayroll && (
+            <button
+              className={`btn ${activeTab === 'payroll' ? 'btn-primary' : 'btn-ghost'}`}
+              style={{ borderRadius: 'var(--radius-md)', padding: '8px 16px' }}
+              onClick={() => setActiveTab('payroll')}
+            >
+              <DollarSign size={16} /> Payroll & Salaries
+            </button>
+          )}
+        </div>
+
+        {activeTab === 'directory' && isRoleAllowed(['Admin', 'Manager']) && (
+          <button className="btn btn-primary" onClick={openAddModal}>
+            <Plus size={16} /> Add Employee
           </button>
         )}
       </div>
@@ -406,13 +414,7 @@ const Employees = ({ initialTab = 'directory' }) => {
       ) : activeTab === 'directory' ? (
         // STAFF DIRECTORY VIEW
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div className="page-actions-row" style={{ justifyContent: 'flex-end' }}>
-            {isRoleAllowed(['Admin', 'Manager']) && (
-              <button className="btn btn-primary" onClick={openAddModal}>
-                <Plus size={16} /> Add Employee
-              </button>
-            )}
-          </div>
+
 
           {employees.length === 0 ? (
             <div className="glass-panel" style={{ padding: '60px 24px', textAlign: 'center' }}>

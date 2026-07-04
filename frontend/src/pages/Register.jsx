@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, User, Briefcase, UserCheck, ArrowLeft, AlertCircle, CheckCircle, Tag, Shield, Crown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { getFirstSidebarPath } from '../utils/navigation';
 
 const EMPLOYEE_DESIGNATIONS = [
   'Cashier', 'Sales Executive', 'Store Keeper', 'Warehouse Staff',
@@ -80,7 +81,8 @@ const Register = () => {
                 ? 'Accountant account created successfully! Redirecting...'
                 : 'Employee account created successfully! Redirecting...'
         );
-        navigate(['Staff', 'Employee'].includes(role) ? '/dashboard/billing' : '/dashboard');
+        const path = getFirstSidebarPath(role, false);
+        navigate(path);
       } else {
         setError(res.message || 'Registration failed. Check if user already exists or if Business ID is valid.');
       }

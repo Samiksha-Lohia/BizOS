@@ -14,6 +14,6 @@ router.use(protect);
 router.post("/", authorizeRoles("Admin", "Manager", "Staff"), createExpense);
 router.get("/", authorizeRoles("Admin", "Manager", "Accountant"), getExpenses);
 router.get("/profit-loss", authorizeRoles("Admin", "Manager", "Accountant"), getProfitLoss);
-router.put("/:id/approve", authorizeRoles("Admin", "Manager"), approveExpense);
+router.put("/:id/approve", authorizeRoles("Admin", "Manager", "Accountant"), approveExpense);
 
 export default router;

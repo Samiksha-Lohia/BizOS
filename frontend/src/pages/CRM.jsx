@@ -36,8 +36,14 @@ const CRM = () => {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState('');
   const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentType, setPaymentType] = useState('pay'); // 'pay' or 'set'
   
   const [currentCustomer, setCurrentCustomer] = useState(null);
+
+  const handlePaymentTypeChange = (newType) => {
+    setPaymentType(newType);
+    setPaymentAmount(currentCustomer?.outstandingBalance?.toString() || '0');
+  };
 
   // Form states
   const [formData, setFormData] = useState({
@@ -79,6 +85,7 @@ const CRM = () => {
 
   const openPaymentModal = (customer) => {
     setCurrentCustomer(customer);
+    setPaymentType('pay');
     setPaymentAmount(customer.outstandingBalance.toString());
     setIsPaymentModalOpen(true);
   };
@@ -95,7 +102,10 @@ const CRM = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ amount: Number(paymentAmount) })
+        body: JSON.stringify({ 
+          amount: Number(paymentAmount),
+          type: paymentType
+        })
       });
       const result = await res.json();
       if (result.success) {
@@ -580,13 +590,43 @@ const CRM = () => {
                   </div>
                 </div>
 
+                <div className="form-group" style={{ marginTop: '8px', marginBottom: '16px' }}>
+                  <label className="form-label">Payment Action</label>
+                  <div style={{ display: 'flex', gap: '16px' }}>
+                    <label className="checkbox-label">
+                      <input
+                        type="radio"
+                        name="paymentType"
+                        value="pay"
+                        checked={paymentType === 'pay'}
+                        onChange={() => handlePaymentTypeChange('pay')}
+                        style={{ accentColor: 'var(--primary)' }}
+                      />
+                      Deduct Dues (-)
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="radio"
+                        name="paymentType"
+                        value="set"
+                        checked={paymentType === 'set'}
+                        onChange={() => handlePaymentTypeChange('set')}
+                        style={{ accentColor: 'var(--primary)' }}
+                      />
+                      Set Total Dues (=)
+                    </label>
+                  </div>
+                </div>
+
                 <div className="form-group">
-                  <label className="form-label" htmlFor="payment-amount">Payment Amount (₹)</label>
+                  <label className="form-label" htmlFor="payment-amount">
+                    {paymentType === 'set' ? 'New Total Dues Balance (₹)' : 'Payment Amount (₹)'}
+                  </label>
                   <input
                     id="payment-amount"
                     type="number"
-                    min="1"
-                    max={currentCustomer.outstandingBalance}
+                    min={paymentType === 'set' ? '0' : '1'}
+                    max={paymentType === 'set' ? undefined : currentCustomer.outstandingBalance}
                     required
                     className="form-input"
                     value={paymentAmount}
@@ -597,7 +637,7 @@ const CRM = () => {
               <div className="modal-footer">
                 <button type="button" className="btn btn-ghost" onClick={() => setIsPaymentModalOpen(false)}>Cancel</button>
                 <button type="submit" className="btn btn-primary" disabled={paymentLoading}>
-                  {paymentLoading ? 'Recording...' : 'Record Payment'}
+                  {paymentLoading ? 'Recording...' : 'Confirm'}
                 </button>
               </div>
             </form>

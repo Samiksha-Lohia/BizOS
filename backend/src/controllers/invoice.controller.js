@@ -62,7 +62,10 @@ export const createInvoice = async (req, res) => {
       });
     }
 
-    const totalAmount = subtotal + taxTotal;
+    const roundedSubtotal = Math.round(subtotal * 100) / 100;
+    const roundedTaxTotal = Math.round(taxTotal * 100) / 100;
+    const roundedDiscountTotal = Math.round(discountTotal * 100) / 100;
+    const totalAmount = Math.round((roundedSubtotal + roundedTaxTotal) * 100) / 100;
     
     // Resolve paid amount
     let paid = 0;
@@ -72,38 +75,40 @@ export const createInvoice = async (req, res) => {
       paid = paymentMode === "Credit" ? 0 : totalAmount;
     }
 
-    if (paid > totalAmount) {
+    const roundedPaid = Math.round(paid * 100) / 100;
+
+    if (roundedPaid > totalAmount) {
       return res.status(400).json({
         success: false,
         message: `Paid amount (₹${paid}) cannot exceed the grand total (₹${totalAmount.toFixed(2)}).`
       });
     }
 
-    if (paid < 0) {
+    if (roundedPaid < 0) {
       return res.status(400).json({
         success: false,
         message: "Paid amount cannot be negative."
       });
     }
 
-    const outstandingAmount = Math.max(0, totalAmount - paid);
+    const outstandingAmount = Math.max(0, Math.round((totalAmount - roundedPaid) * 100) / 100);
 
     let status = "Paid";
     if (outstandingAmount > 0) {
-      status = paid > 0 ? "Partially Paid" : "Unpaid";
+      status = roundedPaid > 0 ? "Partially Paid" : "Unpaid";
     }
 
     const invoice = await Invoice.create({
       invoiceNumber,
       customerId,
       items: processedItems,
-      subtotal,
-      taxTotal,
-      discountTotal,
+      subtotal: roundedSubtotal,
+      taxTotal: roundedTaxTotal,
+      discountTotal: roundedDiscountTotal,
       totalAmount,
       paymentMode,
       status,
-      paidAmount: paid,
+      paidAmount: roundedPaid,
       outstandingAmount,
       dueDate,
       businessId,

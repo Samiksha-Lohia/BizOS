@@ -80,9 +80,19 @@ const Inventory = () => {
   };
 
   const handleStockAdjustChange = (e) => {
+    const nextType = e.target.name === 'type' ? e.target.value : stockAdjustment.type;
+    let nextQty = e.target.name === 'quantity' ? e.target.value : stockAdjustment.quantity;
+    
+    if (e.target.name === 'type' && e.target.value === 'set') {
+      nextQty = currentProduct?.stockQuantity?.toString() || '0';
+    } else if (e.target.name === 'type' && (e.target.value === 'in' || e.target.value === 'out') && stockAdjustment.type === 'set') {
+      nextQty = '1';
+    }
+    
     setStockAdjustment({
       ...stockAdjustment,
-      [e.target.name]: e.target.value
+      type: nextType,
+      quantity: nextQty
     });
   };
 
@@ -164,7 +174,7 @@ const Inventory = () => {
     setSuccess('');
 
     try {
-      const response = await authFetch(`1/products/${currentProduct._id}/stock`, {
+      const response = await authFetch(`/products/${currentProduct._id}/stock`, {
         method: 'POST',
         body: JSON.stringify({
           quantity: Number(stockAdjustment.quantity),
@@ -517,7 +527,7 @@ const Inventory = () => {
 
                 <div className="form-group" style={{ marginTop: '8px' }}>
                   <label className="form-label">Adjustment Type</label>
-                  <div style={{ display: 'flex', gap: '16px' }}>
+                  <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                     <label className="checkbox-label">
                       <input
                         type="radio"
@@ -540,16 +550,29 @@ const Inventory = () => {
                       />
                       Remove Stock (-)
                     </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="radio"
+                        name="type"
+                        value="set"
+                        checked={stockAdjustment.type === 'set'}
+                        onChange={handleStockAdjustChange}
+                        style={{ accentColor: 'var(--primary)' }}
+                      />
+                      Set Total (=)
+                    </label>
                   </div>
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label" htmlFor="stock-quantity">Adjustment Quantity ({currentProduct?.unit}) *</label>
+                  <label className="form-label" htmlFor="stock-quantity">
+                    {stockAdjustment.type === 'set' ? 'New Total Stock Level' : 'Adjustment Quantity'} ({currentProduct?.unit}) *
+                  </label>
                   <input
                     id="stock-quantity"
                     type="number"
                     name="quantity"
-                    min="1"
+                    min={stockAdjustment.type === 'set' ? '0' : '1'}
                     className="form-input"
                     style={{ paddingLeft: '16px' }}
                     value={stockAdjustment.quantity}

@@ -9,13 +9,13 @@
   --accent-hover: #bda060;
   --accent-light: rgba(200, 169, 107, 0.08);
   --accent-glow: rgba(200, 169, 107, 0.15);
-  --bg1: #FBF9F4;
+  --bg1: #e8f3ee;
   --bg2: #FFFFFF;
-  --bg3: #F3EEE3;
+  --bg3: #dbe8e1;
   --txt1: #1C201A;
   --txt2: #50584D;
   --txt-m: #8C9686;
-  --bd: #EAE5D8;
+  --bd: #d0ded6;
   --gls-b: var(--bg2);
   --gls-bd: var(--bd);
   --glass-blur: 0px;
@@ -59,7 +59,7 @@
   --inf: #7cb8b8;
   --inf-bg: rgba(124, 184, 184, 0.08);
 
-  --gradient-hero: linear-gradient(135deg, var(--pri) 0%, var(--accent) 100%);
+  --gradient-hero: linear-gradient(135deg, var(--pri) 0%, #4E7C69 100%);
   --gradient-dark-overlay: radial-gradient(circle at top, var(--pri-l) 0%, transparent 70%);
 
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
@@ -130,7 +130,7 @@ html.dark {
   --inf: #8ecaca;
   --inf-bg: rgba(142, 202, 202, 0.15);
 
-  --gradient-hero: linear-gradient(135deg, var(--pri) 0%, var(--accent) 100%);
+  --gradient-hero: linear-gradient(135deg, #1c352a 0%, #2a4c3e 100%);
   --gradient-dark-overlay: radial-gradient(circle at top, var(--pri-l) 0%, transparent 60%);
 }
 
@@ -189,4 +189,14 @@ button, input, select, textarea {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
+}
+
+/* Hide number input spinners (up/down counters) globally */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
 }

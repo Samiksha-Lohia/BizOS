@@ -14,7 +14,8 @@ import {
   Percent,
   Loader2,
   AlertTriangle,
-  Edit
+  Edit,
+  User
 } from 'lucide-react';
 
 const Settings = () => {
@@ -33,6 +34,52 @@ const Settings = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [copied, setCopied] = useState(false);
+
+  const [saForm, setSaForm] = useState({ name: '', email: '', password: '' });
+
+  useEffect(() => {
+    if (user) {
+      setSaForm({
+        name: user.name || '',
+        email: user.email || '',
+        password: ''
+      });
+    }
+  }, [user]);
+
+  const handleSaSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const response = await authFetch('/superadmin/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: saForm.name,
+          email: saForm.email,
+          ...(saForm.password ? { password: saForm.password } : {})
+        })
+      });
+      const result = await response.json();
+      if (result.success) {
+        setSuccess('Super Admin profile updated successfully. Syncing session...');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } else {
+        setError(result.message || 'Failed to update profile.');
+      }
+    } catch (err) {
+      setError('Connection to auth server failed.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const isAdmin = user?.role === 'Admin';
 
@@ -149,6 +196,108 @@ const Settings = () => {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
         <Loader2 className="spinner-icon" size={32} />
+      </div>
+    );
+  }
+
+  if (user?.role === 'SuperAdmin') {
+    const superAdminId = user?._id || user?.id || '—';
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px', margin: '0 auto' }}>
+        {error && <div className="error-message"><AlertTriangle size={16} /> {error}</div>}
+        {success && <div className="success-message"><Check size={16} /> {success}</div>}
+
+        {/* Shareable Link ID info card */}
+        <div className="glass-panel" style={{ padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+          <div>
+            <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '6px' }}>Super Admin System ID</h3>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '8px' }}>
+              This is your unique Super Admin identifier. Use this to perform system-level management actions.
+            </p>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'var(--border-color)', padding: '6px 12px', borderRadius: 'var(--radius-sm)', fontFamily: 'monospace', fontSize: '14px', fontWeight: 600 }}>
+              {superAdminId}
+            </div>
+          </div>
+          <button className="btn btn-secondary" onClick={() => {
+            navigator.clipboard.writeText(superAdminId);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+          }} style={{ display: 'flex', gap: '8px', height: '40px' }}>
+            {copied ? <Check size={16} color="var(--accent-green)" /> : <Copy size={16} />}
+            {copied ? 'Copied!' : 'Copy ID'}
+          </button>
+        </div>
+
+        {/* Profile Card */}
+        <div className="glass-panel" style={{ padding: '32px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid var(--border-color)', paddingBottom: '16px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <User size={20} color="var(--primary)" /> Super Admin Profile & Settings
+            </h3>
+          </div>
+          
+          <form onSubmit={handleSaSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+              <div className="form-group">
+                <label className="form-label" htmlFor="sa-name">Full Name *</label>
+                <div className="input-wrapper">
+                  <User className="input-icon" size={16} style={{ color: 'var(--text-muted)', left: '12px' }} />
+                  <input
+                    id="sa-name"
+                    type="text"
+                    className="form-input"
+                    value={saForm.name}
+                    onChange={e => setSaForm({ ...saForm, name: e.target.value })}
+                    required
+                    disabled={saving}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label" htmlFor="sa-email">Email Address *</label>
+                <div className="input-wrapper">
+                  <Mail className="input-icon" size={16} style={{ color: 'var(--text-muted)', left: '12px' }} />
+                  <input
+                    id="sa-email"
+                    type="email"
+                    className="form-input"
+                    value={saForm.email}
+                    onChange={e => setSaForm({ ...saForm, email: e.target.value })}
+                    required
+                    disabled={saving}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="form-group" style={{ maxWidth: '380px' }}>
+              <label className="form-label" htmlFor="sa-pass">New Password (Leave blank to keep current)</label>
+              <div className="input-wrapper">
+                <Briefcase className="input-icon" size={16} style={{ color: 'var(--text-muted)', left: '12px' }} />
+                <input
+                  id="sa-pass"
+                  type="password"
+                  placeholder="Min 6 characters"
+                  className="form-input"
+                  value={saForm.password}
+                  onChange={e => setSaForm({ ...saForm, password: e.target.value })}
+                  disabled={saving}
+                />
+              </div>
+            </div>
+
+            <button 
+              type="submit" 
+              className="btn btn-primary" 
+              disabled={saving}
+              style={{ display: 'flex', gap: '8px', alignSelf: 'flex-end', marginTop: '10px', padding: '10px 24px' }}
+            >
+              {saving ? <Loader2 className="spinner-icon" size={16} /> : <Save size={16} />}
+              {saving ? 'Saving changes...' : 'Save Configuration'}
+            </button>
+          </form>
+        </div>
       </div>
     );
   }

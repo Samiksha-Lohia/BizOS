@@ -19,6 +19,7 @@ const Dashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [hoveredGroup, setHoveredGroup] = useState(null);
 
   const fetchDashboardData = async () => {
     try {
@@ -105,32 +106,49 @@ const Dashboard = () => {
   const avgSalesHeight = maxAvg > 0 ? `${Math.min(100, Math.max(10, (avgDailySales / maxAvg) * 100))}%` : '4px';
   const avgExpenseHeight = maxAvg > 0 ? `${Math.min(100, Math.max(10, (avgDailyExpenses / maxAvg) * 100))}%` : '4px';
 
-  return (
-    <div className="dashboard-content">
-      {/* Intro banner */}
-      <div className="glass-panel" style={{ padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-        <div>
-          <h2 style={{ fontSize: '20px', fontWeight: 800, marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Sparkles size={20} color="var(--primary)" /> BizOS Insights Dashboard
-          </h2>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Live operations ledger, financial analytics, and team status.</p>
-        </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button className="btn btn-secondary btn-sm" onClick={fetchDashboardData}>Refresh</button>
-          <Link to="/dashboard/billing">
-            <button className="btn btn-primary btn-sm">New Invoice</button>
-          </Link>
-        </div>
-      </div>
+  // Let's find the max value to set scale of Y axis
+  const chartSalesToday = displayTodaySales;
+  const chartExpenseToday = displayTodayExpenses;
+  const chartSalesMonthly = displayMonthlyRevenue;
+  const chartExpenseMonthly = displayMonthlyExpenses;
+  const chartSalesAvg = avgDailySales;
+  const chartExpenseAvg = avgDailyExpenses;
 
+  const maxVal = Math.max(
+    chartSalesToday,
+    chartExpenseToday,
+    chartSalesMonthly,
+    chartExpenseMonthly,
+    chartSalesAvg,
+    chartExpenseAvg,
+    1000
+  );
+
+  let yMax = 100000;
+  if (maxVal > 100000) {
+    yMax = Math.ceil(maxVal / 50000) * 50000;
+  } else if (maxVal > 50000) {
+    yMax = 100000;
+  } else if (maxVal > 25000) {
+    yMax = 50000;
+  } else if (maxVal > 10000) {
+    yMax = 25000;
+  } else {
+    yMax = Math.ceil(maxVal / 1000) * 1000 || 1000;
+  }
+
+  const yTicks = [yMax, yMax * 0.75, yMax * 0.5, yMax * 0.25, 0];
+
+  return (
+    <div className="dashboard-content-main">
       {/* KPIs Grid */}
       <div className="kpis-grid">
         {/* KPI: Monthly Revenue */}
         <div className="kpi-card glass-panel revenue">
           <div className="kpi-header">
             <span className="kpi-title">Monthly Revenue</span>
-            <div className="kpi-icon-box">
-              <DollarSign size={20} />
+            <div className="kpi-icon-box font-icon-rev">
+              <DollarSign size={18} />
             </div>
           </div>
           <span className="kpi-value">₹{monthlySnapshot.revenue.toLocaleString('en-IN')}</span>
@@ -144,13 +162,13 @@ const Dashboard = () => {
         <div className="kpi-card glass-panel expense">
           <div className="kpi-header">
             <span className="kpi-title">Monthly Expenses</span>
-            <div className="kpi-icon-box">
-              <TrendingDown size={20} />
+            <div className="kpi-icon-box font-icon-exp">
+              <TrendingDown size={18} />
             </div>
           </div>
           <span className="kpi-value">₹{monthlySnapshot.expenses.toLocaleString('en-IN')}</span>
           <div className="kpi-trend neutral">
-            <Calendar size={14} />
+            <TrendingDown size={14} />
             <span>This calendar month</span>
           </div>
         </div>
@@ -159,14 +177,15 @@ const Dashboard = () => {
         <div className="kpi-card glass-panel profit">
           <div className="kpi-header">
             <span className="kpi-title">Net Profit</span>
-            <div className="kpi-icon-box">
-              <TrendingUp size={20} />
+            <div className="kpi-icon-box font-icon-prof">
+              <TrendingUp size={18} />
             </div>
           </div>
-          <span className="kpi-value" style={{ color: monthlySnapshot.profitOrLoss >= 0 ? 'var(--accent-green)' : 'var(--accent-red)' }}>
+          <span className="kpi-value" style={{ color: monthlySnapshot.profitOrLoss >= 0 ? 'var(--pri)' : 'var(--alr)' }}>
             ₹{monthlySnapshot.profitOrLoss.toLocaleString('en-IN')}
           </span>
           <div className={`kpi-trend ${monthlySnapshot.profitOrLoss >= 0 ? 'up' : 'down'}`}>
+            {monthlySnapshot.profitOrLoss >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
             <span>Margin: {monthlySnapshot.revenue > 0 ? Math.round((monthlySnapshot.profitOrLoss / monthlySnapshot.revenue) * 100) : 0}%</span>
           </div>
         </div>
@@ -175,12 +194,13 @@ const Dashboard = () => {
         <div className="kpi-card glass-panel attendance">
           <div className="kpi-header">
             <span className="kpi-title">Attendance Rate</span>
-            <div className="kpi-icon-box">
-              <Users size={20} />
+            <div className="kpi-icon-box font-icon-att">
+              <Users size={18} />
             </div>
           </div>
           <span className="kpi-value">{attendanceRate}%</span>
           <div className="kpi-trend info">
+            <TrendingUp size={14} />
             <span>{presentEmp} / {totalEmp} staff present today</span>
           </div>
         </div>
@@ -190,49 +210,122 @@ const Dashboard = () => {
       <div className="dashboard-grid-two">
         {/* Sales vs Expenses chart */}
         <div className="chart-card glass-panel">
-          <h3 className="card-title">
-            Income & Expense Overview
-            <span style={{ fontSize: '12px', fontWeight: 'normal', color: 'var(--text-muted)' }}>
-              {isDemoMode ? 'Comparison Overview (Sample Analytics)' : 'Comparison Overview'}
-            </span>
-          </h3>
-          <div className="custom-chart-wrapper">
-            <div className="chart-bars-container">
-              {/* Today */}
-              <div className="chart-bar-group">
-                <div className="dual-bars">
-                  <div className="bar-sales" style={{ height: displayTodaySales > 0 ? `${Math.min(100, Math.max(10, (displayTodaySales / Math.max(displayTodaySales, displayTodayExpenses)) * 100))}%` : '4px' }}></div>
-                  <div className="bar-expense" style={{ height: displayTodayExpenses > 0 ? `${Math.min(100, Math.max(10, (displayTodayExpenses / Math.max(displayTodaySales, displayTodayExpenses)) * 100))}%` : '4px' }}></div>
-                </div>
-                <span className="chart-label-x">Today</span>
+          <div className="chart-header-row">
+            <h3 className="card-title-custom">Income & Expense Overview</h3>
+            <span className="chart-comparison-sub">Comparison Overview</span>
+          </div>
+          
+          <div className="custom-chart-wrapper-new">
+            <div className="chart-layout-with-axis">
+              {/* Y Axis ticks */}
+              <div className="chart-y-axis">
+                {yTicks.map((tick, i) => (
+                  <span key={i} className="chart-y-tick">{tick.toLocaleString('en-IN')}</span>
+                ))}
               </div>
 
-              {/* Monthly totals */}
-              <div className="chart-bar-group">
-                <div className="dual-bars">
-                  <div className="bar-sales" style={{ height: displayMonthlyRevenue > 0 ? `${Math.min(100, Math.max(10, (displayMonthlyRevenue / Math.max(displayMonthlyRevenue, displayMonthlyExpenses)) * 100))}%` : '4px' }}></div>
-                  <div className="bar-expense" style={{ height: displayMonthlyExpenses > 0 ? `${Math.min(100, Math.max(10, (displayMonthlyExpenses / Math.max(displayMonthlyRevenue, displayMonthlyExpenses)) * 100))}%` : '4px' }}></div>
+              {/* Chart container wrapper */}
+              <div className="chart-bars-container-wrapper">
+                {/* Horizontal dotted gridlines */}
+                <div className="chart-gridlines">
+                  {yTicks.map((_, i) => (
+                    <div key={i} className="chart-gridline"></div>
+                  ))}
                 </div>
-                <span className="chart-label-x">Monthly</span>
-              </div>
 
-              {/* Targets */}
-              <div className="chart-bar-group">
-                <div className="dual-bars">
-                  <div className="bar-sales" style={{ height: avgSalesHeight, opacity: 0.6 }} title={`Avg Daily Sales: ₹${avgDailySales.toFixed(2)}`}></div>
-                  <div className="bar-expense" style={{ height: avgExpenseHeight, opacity: 0.6 }} title={`Avg Daily Expenses: ₹${avgDailyExpenses.toFixed(2)}`}></div>
+                {/* Bars */}
+                <div className="chart-bars-container-new">
+                  {/* Today */}
+                  <div 
+                    className="chart-bar-group-new"
+                    onMouseEnter={() => setHoveredGroup('Today')}
+                    onMouseLeave={() => setHoveredGroup(null)}
+                  >
+                    {hoveredGroup === 'Today' && <div className="chart-group-highlight"></div>}
+                    {hoveredGroup === 'Today' && (
+                      <div className="chart-tooltip">
+                        <h4 className="tooltip-title">Today</h4>
+                        <div className="tooltip-row text-sales">
+                          <span>Revenue (Sales) : </span>
+                          <strong>{Math.round(chartSalesToday)}</strong>
+                        </div>
+                        <div className="tooltip-row text-expense">
+                          <span>Operating Expense : </span>
+                          <strong>{Math.round(chartExpenseToday)}</strong>
+                        </div>
+                      </div>
+                    )}
+                    <div className="dual-bars-new">
+                      <div className="bar-sales-new" style={{ height: `${Math.max(4, (chartSalesToday / yMax) * 100)}%` }}></div>
+                      <div className="bar-expense-new" style={{ height: `${Math.max(4, (chartExpenseToday / yMax) * 100)}%` }}></div>
+                    </div>
+                    <span className="chart-label-x-new">Today</span>
+                  </div>
+
+                  {/* Monthly totals */}
+                  <div 
+                    className="chart-bar-group-new"
+                    onMouseEnter={() => setHoveredGroup('Monthly')}
+                    onMouseLeave={() => setHoveredGroup(null)}
+                  >
+                    {hoveredGroup === 'Monthly' && <div className="chart-group-highlight"></div>}
+                    {hoveredGroup === 'Monthly' && (
+                      <div className="chart-tooltip">
+                        <h4 className="tooltip-title">Monthly</h4>
+                        <div className="tooltip-row text-sales">
+                          <span>Revenue (Sales) : </span>
+                          <strong>{Math.round(chartSalesMonthly)}</strong>
+                        </div>
+                        <div className="tooltip-row text-expense">
+                          <span>Operating Expense : </span>
+                          <strong>{Math.round(chartExpenseMonthly)}</strong>
+                        </div>
+                      </div>
+                    )}
+                    <div className="dual-bars-new">
+                      <div className="bar-sales-new" style={{ height: `${Math.max(4, (chartSalesMonthly / yMax) * 100)}%` }}></div>
+                      <div className="bar-expense-new" style={{ height: `${Math.max(4, (chartExpenseMonthly / yMax) * 100)}%` }}></div>
+                    </div>
+                    <span className="chart-label-x-new">Monthly</span>
+                  </div>
+
+                  {/* Targets */}
+                  <div 
+                    className="chart-bar-group-new"
+                    onMouseEnter={() => setHoveredGroup('Averages')}
+                    onMouseLeave={() => setHoveredGroup(null)}
+                  >
+                    {hoveredGroup === 'Averages' && <div className="chart-group-highlight"></div>}
+                    {hoveredGroup === 'Averages' && (
+                      <div className="chart-tooltip">
+                        <h4 className="tooltip-title">Averages</h4>
+                        <div className="tooltip-row text-sales">
+                          <span>Revenue (Sales) : </span>
+                          <strong>{Math.round(chartSalesAvg)}</strong>
+                        </div>
+                        <div className="tooltip-row text-expense">
+                          <span>Operating Expense : </span>
+                          <strong>{Math.round(chartExpenseAvg)}</strong>
+                        </div>
+                      </div>
+                    )}
+                    <div className="dual-bars-new">
+                      <div className="bar-sales-new" style={{ height: `${Math.max(4, (chartSalesAvg / yMax) * 100)}%` }}></div>
+                      <div className="bar-expense-new" style={{ height: `${Math.max(4, (chartExpenseAvg / yMax) * 100)}%` }}></div>
+                    </div>
+                    <span className="chart-label-x-new">Averages</span>
+                  </div>
                 </div>
-                <span className="chart-label-x">Averages</span>
               </div>
             </div>
 
-            <div className="chart-legend">
-              <div className="legend-item">
-                <span className="legend-color" style={{ backgroundColor: 'var(--accent-green)' }}></span>
+            <div className="chart-legend-new">
+              <div className="legend-item-new">
+                <span className="legend-color-new bg-sales"></span>
                 <span>Revenue (Sales)</span>
               </div>
-              <div className="legend-item">
-                <span className="legend-color" style={{ backgroundColor: 'var(--accent-red)' }}></span>
+              <div className="legend-item-new">
+                <span className="legend-color-new bg-expense"></span>
                 <span>Operating Expense</span>
               </div>
             </div>
@@ -240,30 +333,32 @@ const Dashboard = () => {
         </div>
 
         {/* Low Stock Alerts & Debtors */}
-        <div className="recent-activities-card glass-panel" style={{ height: 'auto' }}>
-          <h3 className="card-title" style={{ marginBottom: '16px' }}>
-            Immediate Alerts
-            {lowStockAlertsCount > 0 && <span className="status-pill danger" style={{ fontSize: '10px' }}>{lowStockAlertsCount} stock alerts</span>}
-          </h3>
+        <div className="recent-activities-card-new glass-panel">
+          <div className="alerts-header-row">
+            <h3 className="card-title-custom">Immediate Alerts</h3>
+            {lowStockAlertsCount > 0 && <span className="alert-badge-danger">{lowStockAlertsCount} stock alert</span>}
+          </div>
           
-          <div className="activity-list" style={{ maxHeight: '280px' }}>
+          <div className="activity-list-new">
             {lowStockAlerts.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-muted)', fontSize: '13px' }}>
-                <ShoppingBag size={24} style={{ marginBottom: '8px', opacity: 0.5 }} />
+              <div className="all-stable-alert">
+                <ShoppingBag size={24} className="stable-icon" />
                 <p>All product stocks are stable.</p>
               </div>
             ) : (
               lowStockAlerts.map((prod, i) => (
-                <div key={i} className="activity-item">
-                  <div className="activity-icon-box" style={{ background: 'var(--accent-red-bg)', color: 'var(--accent-red)' }}>
-                    <AlertTriangle size={16} />
+                <div key={i} className="stock-warning-box">
+                  <div className="stock-warning-header">
+                    <div className="warning-icon-circle">
+                      <AlertTriangle size={18} />
+                    </div>
+                    <div className="warning-text-container">
+                      <span className="warning-title-text">{prod.name} running low</span>
+                      <span className="warning-desc-text">Current stock: {prod.quantity} · Min threshold: {prod.minLevel}</span>
+                    </div>
                   </div>
-                  <div className="activity-text">
-                    <span className="activity-desc">{prod.name} running low</span>
-                    <span className="activity-time">Current stock: {prod.quantity} (Min threshold: {prod.minLevel})</span>
-                  </div>
-                  <Link to="/dashboard/inventory" className="action-btn" style={{ width: 'auto', padding: '0 8px', fontSize: '11px', fontWeight: 600 }}>
-                    Restock
+                  <Link to="/dashboard/inventory" className="restock-now-button">
+                    Restock now
                   </Link>
                 </div>
               ))
@@ -271,17 +366,17 @@ const Dashboard = () => {
           </div>
 
           {/* Top Debtors overview */}
-          <h3 className="card-title" style={{ marginTop: '20px', marginBottom: '12px', fontSize: '14px' }}>
+          <h3 className="card-title-custom" style={{ marginTop: '24px', marginBottom: '16px' }}>
             Top Outstanding Credits
           </h3>
-          <div className="activity-list" style={{ maxHeight: '180px' }}>
+          <div className="debtors-list-new">
             {topDebtors.length === 0 ? (
-              <p style={{ fontSize: '12px', color: 'var(--text-muted)', paddingLeft: '8px' }}>No pending customer dues.</p>
+              <p className="no-credits-text">No pending customer dues.</p>
             ) : (
               topDebtors.map((debtor, idx) => (
-                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', fontSize: '13px', borderBottom: '1px solid var(--border-color)' }}>
-                  <span style={{ fontWeight: 500 }}>{debtor.name}</span>
-                  <span style={{ color: 'var(--accent-orange)', fontWeight: 700 }}>₹{debtor.amount.toLocaleString('en-IN')}</span>
+                <div key={idx} className="debtor-row-new">
+                  <span className="debtor-name-new">{debtor.name}</span>
+                  <span className="debtor-amount-new">₹{debtor.amount.toLocaleString('en-IN')}</span>
                 </div>
               ))
             )}
@@ -290,20 +385,22 @@ const Dashboard = () => {
       </div>
 
       {/* Top Products & Top Customers lists */}
-      <div className="dashboard-grid-two" style={{ gridTemplateColumns: '1fr 1fr' }}>
+      <div className="dashboard-grid-two">
         {/* Top selling products */}
         <div className="glass-panel" style={{ padding: '24px' }}>
-          <h3 className="card-title" style={{ fontSize: '15px' }}>Top Performing Products</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
+          <h3 className="card-title-custom" style={{ marginBottom: '16px' }}>Top Performing Products</h3>
+          <div className="top-performing-products-list">
             {topProducts.length === 0 ? (
-              <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No sales recorded yet.</p>
+              <p className="no-sales-text">No sales recorded yet.</p>
             ) : (
               topProducts.map((p, idx) => (
-                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px', padding: '8px 0', borderBottom: '1px solid var(--border-color)' }}>
-                  <span style={{ fontWeight: 500 }}>{p.name}</span>
-                  <div style={{ textAlign: 'right' }}>
-                    <span style={{ fontWeight: 700, color: 'var(--primary)' }}>₹{p.revenue.toLocaleString('en-IN')}</span>
-                    <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block' }}>{p.quantity} units sold</span>
+                <div key={idx} className="product-row-new">
+                  <div className="product-details-new">
+                    <span className="product-name-new">{p.name}</span>
+                    <span className="product-units-new">{p.quantity} unit sold</span>
+                  </div>
+                  <div className="product-revenue-badge">
+                    ₹{p.revenue.toLocaleString('en-IN')}
                   </div>
                 </div>
               ))
@@ -313,15 +410,15 @@ const Dashboard = () => {
 
         {/* Top Customers list */}
         <div className="glass-panel" style={{ padding: '24px' }}>
-          <h3 className="card-title" style={{ fontSize: '15px' }}>Top Loyal Customers</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
+          <h3 className="card-title-custom" style={{ marginBottom: '16px' }}>Top Loyal Customers</h3>
+          <div className="top-loyal-customers-list">
             {topCustomers.length === 0 ? (
-              <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No customers registered yet.</p>
+              <p className="no-customers-text">No customers registered yet.</p>
             ) : (
               topCustomers.map((c, idx) => (
-                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px', padding: '8px 0', borderBottom: '1px solid var(--border-color)' }}>
-                  <span style={{ fontWeight: 500 }}>{c.name}</span>
-                  <span className="status-pill info" style={{ fontSize: '11px' }}>{c.loyaltyPoints} points</span>
+                <div key={idx} className="customer-row-new">
+                  <span className="customer-name-new">{c.name}</span>
+                  <span className="customer-points-badge-new">{c.loyaltyPoints} points</span>
                 </div>
               ))
             )}
