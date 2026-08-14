@@ -10,6 +10,7 @@
 
 ## 📋 Table of Contents
 - [Overview](#-overview)
+- [App Previews](#-app-previews)
 - [What Makes BizOS Different](#-what-makes-bizos-different)
 - [Core Features & Modules](#-core-features--modules)
 - [System Architecture](#-system-architecture)
@@ -28,6 +29,16 @@
 BizOS is designed as a centralized platform for small business owners and managers to monitor operations in real-time. By connecting POS billing directly with live inventory and customer ledgers, the platform ensures that every transaction immediately reflects across the business's financial and logistical state.
 
 Additionally, BizOS integrates robust employee shifts and expenses tracking, providing owners with automated monthly payroll sheets and Profit & Loss summaries in one secure space.
+
+---
+
+## 📷 App Previews
+
+### Dashboard & Analytics
+![Dashboard Preview](images/Screenshot%202026-08-14%20105819.png)
+
+### Inventory & Stock Control
+![Inventory Preview](images/Screenshot%202026-08-14%20105847.png)
 
 ---
 
